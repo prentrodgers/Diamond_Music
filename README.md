@@ -11,7 +11,7 @@ Harry Partch first created a diamond with the overtones from 1 to 11. That is, h
 I extended the Tonality Diamond first to the 15-limit, then the 31-limit, meaning the overtones from 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31/16, and the undertones from 32/32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16.
 If you have 16 overtones and 16 undertones on each, you end up with 256 pitches in the tonality diamond. Many are duplicates. Eliminating duplicates you end up with 213 pitches.
 
-Here is a picture of the diamond, with ratios, a note name in Sagittal notation, and the step in the 217 tone to the octave scale.
+Here is a picture of the diamond, with ratios, a note name in Sagittal notation, and the step in a 217 tone version to the octave scale. I used the 2113 in the diamond and added two more at the top and bottom to fill out the spectrum. In these notebooks I started out using that 217 tone scale, then switched to the 256 tone version for mathematical simplification. The 256 tone verion includes many duplicates, but csound doesn't care.
 
 ![Diamond_31-limit](https://user-images.githubusercontent.com/16214057/187750941-36d333f3-bddc-42a2-83a0-e8103719bc77.jpg)
 
