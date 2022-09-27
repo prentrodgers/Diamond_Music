@@ -1,0 +1,69 @@
+ I've revised many of the dictionaries on the past few days, so here they are now:
+      Indexes into the dictionaries
+            mode is 'oton', 'uton' 
+            root is a string: '1/1', '16/19', etc
+            ratio_float is a floating point value 1.0, 1.25, etc.
+            rank is 'A', 'B', 'C', 'D'
+            chord_inversion is 1,2,3,4
+            gliss_type is 'trills_2_step', 'trills_8_step', 'slide'
+            instrument_short_name is a string describing an instrument like 'bfl', 'bss'in the voice_time dictionary in the notebook
+            all_ratio_strings = ratio_strings.reshape(256,)
+
+      Dictionaries in the diamond_music_utils.py
+            keys[mode][ratio] data is 16 note scale steps in 256 tones per octave per f table 3 in the csd file
+            scales[rank][mode] data is 8 steps to index into 16 note scales based on the rank and mode
+            inversions[rank][mode][chord_inversion] data is the index into the 16 note scale step for 4 note chords inverted
+
+      Functions to create structures
+            def build_all_ratios(): returns the all_ratios table for the 31-limit diamond
+            def build_chords(mode, ratio, rank, inversion): # returns a 4 note chord
+            def build_scales(mode, ratio, rank): # returns an 8 note scale
+            def build_scale_mask(scale); # pass an 8 note scale and this function returns a mask to boost the octave for each note
+            def ratio_string_to_float(ratio): # returns a floating point value from a ratio in string form: "16/9"
+            def ratio_distance(start, end): # passed two ratios in string form returns a floating point ratio distance
+            def array_from_dict(time_step_dict): # passed a dictionary representing a set of notes returns an array pt.scoreEvent
+            def make_ftable_glissando(t_num, gliss_type, ratio): # passed a table number, gliss, ratio. returns the array for scoreEvent(0,'f', array)
+            def show_scale_ratios(scale): # pass a scale and return the ratios in the scale as an array of strings
+            def start_logger(fname = LOGNAME): # start the logger 
+            def flushMessages(cs, delay=0): # after shutting down csound, send the queued messages to the log
+            def printMessages(cs, delay=0): # calls flushMessages 
+            def load_csd(csd_file, strip_f0 = False): # reads in the csd text and returns a string which can be passed to csound
+            def load_csound(csd_content): # reads in the long string of csd, returns cs ctcsound instance and pt perform thread
+            def fix_start_duration_values(time_step_array, short_name): # reads in array of time steps, converts duration into start times, updates voice_time['fpn']['start'] 
+            def build_slides(start_table, chord_1, chord_2, gliss_type = 'slide'): # assembles an ftable with a slide starting at start_table and going as many notes as there are in chord_1. returns the the table numbers of the built slides
+            
+
+      Functions in the notebook that take a note_dict with various items
+            def instrument(tone, octave, duration, hold, gliss, voice_name, velocity, stereo, env, upsample, renv, gliss2, gliss3, volume):
+                  Takes the listed values and returns an array ready to be sent to csound
+            chord_play - just what it says. No muss, no fuss. Takes repeats. Used to be called chord_chop 
+            scale_arpeggio - returns a list of 9 notes, a scale plus the start note on top (or bottom)
+                  No repeats. can be flipped to go top to bottom
+            hexad_arpeggio - Complex. Takes a mask, Takes repeats, roll (clumsy), and flip. 
+            root_chord_slide - Takes two chords and will make a slide, or trill as requested. Takes repeats.
+                  Used only in the 16/9, since it has all the slide combos in the A & B ranks 
+                  needs a combo array to indicate what slides work best 
+            chord_slide - Same as root_chord_slide, except it takes any two chords, not only ranks A & B 
+            multiple_chord_slide - calls build_voice_slide. Builds an array of 9 notes by 4 voices based on the bridge_chords dictionary. Passed note_dict, needs to have the following keys:
+                  octv, instruments, dur, hold, env, renv, defaults
+            build_voice_slide - takes a voice and a table number.
+                  builds the gliss table to slide across all notes in the argument & updates the global stored_gliss and current_gliss_table. Watch out it doesn't add a new dimension. May be trouble in the axis in the concatenates.
+            ratio_to_cents - pass it a decimal ratio and get the number of cents back.
+            find_good_inversion(chord_number) - pass it the chord number in bridge_chords and it returns a list of decent inversions. Uses the data in good_slides. 
+            fix_start_times - pass it a note_array and it will turn durations into the correct start time.
+            init_voice_start_times - initializes all the instrument start times to zero. 
+            note_array - takes an array of (voices, notes) and plays returns an array that is ready for csound
+            
+      Dictionaries in the notebook
+            time_step_dict[] data is a set of rows for each column - I'm thinking I need something better than this.
+            voice_time['fpn']['full'] = 'finger piano'
+            voice_time['fpn']['start'] = 0
+            voice_time['fpn']['number'] = 1
+            bridge_chords[bridge_chord_num][start_or_end_chord]['mode']['ratio]['rank']['inversion']
+            bridge_chords = {0: {0: {'mode': 'oton', 'ratio': '16/9', 'rank': 'A'}, # was 0
+                     1: {'mode': 'oton', 'ratio': '8/7', 'rank': 'A'}},
+            right_inversions - an array of inversions for each chord in bridge chords. I should probably   integrate this into bridge chords. Later
+            good_slides - an array of slides to use in the bridge to cycle through the bridge chords
+                  values are [0] - chord number index into the dictionary bridge_chords. Points to a pair of chords.
+                        [1] inversion for the starting chord 
+                        [2] inversion for the ending chord  

@@ -1,0 +1,14 @@
+Here are 20 trips that were able to score better than 323 cent deviation for all four voices out of 25,000 tries
+best_bridge_chord_array = np.array([all_chords_all_inversions[best_test_cases][inx].T for inx in np.arange(len(best_test_cases))])
+print(f'{best_bridge_chord_array.shape = }, {best_bridge_chord_array = }')
+
+best_bridge_chord_array.shape = (20, 4, 9), 
+best_bridge_chord_array = array([[[ 32, 200,  66, 236,  64,  12,  12,  14,  32],
+        [ 36, 204,   2, 224,   0,   0, 204, 206,  36],
+        [ 40, 192, 194, 228, 192,   4, 140, 142,  40],
+        [ 44, 196, 130, 232, 128,   8,  76,  78,  44]],
+
+       [[ 32, 204,   2, 224, 192,   4, 140, 142,  40],
+        [ 36, 192, 194, 228, 128,   8,  76,  78,  44],
+        [ 40, 196, 130, 232,  64,  12,  12,  14,  32],
+        [ 44, 200,  66, 236,   0,   0, 204, 206,  36]],
