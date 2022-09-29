@@ -944,9 +944,6 @@ Include finger piano and balloon drums along with the woodwinds.
 ------------------------------
 9/20/22 To do today:         
 
-2.    Is there some way to limit the number of arguments passed so that defaults can be set and forgotten? 
-      At this point 3/4 of the function lines are dedicated to assignment statements. I hid the problem in an array. 
-
 ✅    I need a systematic search of all the slides to minimize the maximum distance, defined as more than 1.3 or less than 0.75
       So I completed this task, and it suggests the best pair of chords and inversions to use based on minimized movement. But then I need a way to choose the next pair of chords and inversions. 
       So I'm partially finished with this effort. I have the list of inversions that include only slides that are betwen 8/7 and 7/8. Now I want to pick the best. So I look at the sum of cents differences, and for each inversion pair the differences in sum of cents are the same. Why? Is that just the reality? or something more sinister? Since I am selecting for narrow range of potential slides already, and tossing out the outliers, I'm left with only the inversion pairs that have the smallest sum of cents. I increased the range, and started getting different sum of cent values. So I guess it's not sinister at all.
@@ -971,7 +968,7 @@ Include finger piano and balloon drums along with the woodwinds.
       THe key to getting this to work is the start at the end and work your way forward. Check every step to make sure it is returning what you expect.
       
       What I ended up with: 
-            array_of_chords = np.array([(dmu.build_chords(items["mode"], items["ratio"], items["rank"],1)) for items in [bridge_chords[chords][0] for chords in bridge_chords]])
+            array_of_chords = np.array([(dmu.build_chords(items["mode"], items["ratio"], items["rank"],1)) for items in [bridge_chords[chords][0] for chords in bridge_chords]]) # I later simplified this and made it better. 
       Start with the end:
             print(f'{[chords for chords in bridge_chords]}')   
                   [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -1210,33 +1207,27 @@ I took a detour and finally figured out how to get code-server to work. I now ha
              |      |    |        |    |    |      |                           |                           +--down 73/77 to 16/15
             [800.0, 0.0, 2048.0, -7.0, 1.0, 128.0, 1.125, 128.0, 1.125, 128.0, 1.125, 128.0, 1.125, 128.0, 0.948, 128.0, 0.948, 128.0, 0.938, 128.0, 0.938, 128.0, 0.875, 128.0, 0.875, 128.0, 1.143, 128.0, 1.143, 128.0, 1.071, 128.0, 1.071, 128.0, 1.037, 128.0, 1.037]
 
-            I think the problem is an extra .T or a missing .T. It was the latter. Works now, but it still sounds a little weak. 
+            I think the problem is an extra .T or a missing .T. It was the latter. It was solved on 9/27/22 by changing the ratios in the slide from relative to the previuos note to relative to the initial note. Obvious.
             
 ------------------
 9/27/22 To do today:
 
-1.    Find a way to combine several of the "bridge_chord_array":  rng.integers(best_bridge_chord_array.shape[0])
+✅    Find a way to combine several of the "bridge_chord_array":  rng.integers(best_bridge_chord_array.shape[0])
       When I try multiple instances that would overlap, it's not right at all. Each is wrong in its own way. Something is whack with the ratios.
       Then it occasionally comes together. This makes me think it's not picking the right notes. I created ball4.csd to test out ideas. I was able to reduce the slide duration and increase the hold durations of the slides. Now I can more clearly hear that it's not making the right notes.
       
-2.    Combine over 45 seconds the note_array function and the multiple_chord_slide funtion.
+✅    Combine over 45 seconds the note_array function and the multiple_chord_slide funtion.
       Make it so the both go through the nine chords at the same speed.
 
-3.    Build an analog to build_scale_mask(scale): 
+✅    Build an analog to build_scale_mask(scale): 
       Goal: find a way to ensure that the current chord is as close to the previous chord as possible.
       a. Compare all the notes and help out those below a mid-point and not those above the mid-point. 
       b. Take in two chords and build a mask for the second that makes it closer to the first. 
 
-4.    Get serious about drastically lowering the amount of choices that need to be made for each note.
-      a. Take a look at note_dict and see what can be remembered from one call to another.
-      b. Use csound's built in . value to use the previous notes arguments.
-      c. Build a different structure that looks more like my Pascal samples program input. 
-      d. Don't change the structure, but find a way to automate the building of note_dict structures.
-
-5.    Did you know that it's imporant for the final element in the gen07 function table is the last ratio, not a duration. 
+✅    id you know that it's imporant for the final element in the gen07 function table is the last ratio, not a duration. 
       And you can make it bigger than the size of the array and it will just truncate them. If it's too small, it will pad with zeros. 
 
-6.    Wwhat if I ignored direction when ratio_distance was called to provide the ratio to arrive at the next note.
+✅    Wwhat if I ignored direction when ratio_distance was called to provide the ratio to arrive at the next note.
       What if I sometimes need to send the note in the other direction. If you were inside the code, what would you do now?
       Get out the pencil and paper and make sure the ratios are right. Now I have been able to build a csd file that simultaneously plays the chords and the slides. After a few notes, they diverge.
       I figured out the problem. I was assuming that the ratio changes were cumulative. 1.125 followed by another 1.125 would increase a second time. No. It just means it is 1.125 above the initial pitch. I need to make each ratio relative to the starting note.
@@ -1245,7 +1236,7 @@ I took a detour and finally figured out how to get code-server to work. I now ha
       [800.0, 0.0, 2048.0, -7.0, 1.0, 181.0, 1.0, 60.0, 0.9, 181.0, 0.9, 60.0, 1.0125, 181.0, 1.0125, 60.0, 0.96, 181.0, 0.96, 60.0, 1.0285714, 181.0, 1.0285714, 60.0, 1.125, 181.0, 1.125, 60.0, 1.05, 181.0, 1.05, 60.0, 0.9642857, 181.0, 0.9642857, 60.0, 1.0, 181.0, 1.0, 120.0, 1.0]
       I'll just have to follow with a chord on 16/9 oton rank A. It's challenging to get the timing right. 
       I'd also like to make sure I have the best slide choices.
-      Here are the choices: These are all the same!
+      Here are the choices: 
       1     ind = 0
             chosen_array = 0, [[ 32 204   2 224   0  12 204 206  36]
             [ 36 192 194 228 192   0 140 142  40]
@@ -1371,4 +1362,27 @@ I took a detour and finally figured out how to get code-server to work. I now ha
             [ 44 196 130 232  64   8  12  14  32]
             [ 32 200  66 236   0  12 204 206  36]
             [ 36 204   2 224 192   0 140 142  40]]
-So, now that I have fixed the slide 
+
+-------------------------------
+To do 9/29/22:
+
+1.    So, now that I have fixed the multiple_chord_slide funtion I should probably go back and try the combinations that I discarded.
+      Those sounded bad, only because of the bug in multiple_chord_slide. I tried a few different ways to solve the problem. Can you find where you documented those, by date? If so, you can probably recover them from Dropbox. Diamond_music_whisper_song.ipynb on 9/20 look for a line that lets through inversions that include only slides that are betwen ratios 8/7 and 7/8. Before that I was using decimal ratios, but the integer ratios were easier to handle.
+            if 7/8 < decimal_ratio < 8/7: # if it's in this range, then don't add to out_of_range.
+                  pass
+            else:
+                  out_of_range += 1
+            if out_of_range == 0:
+                  # save it. 
+      I found the code.
+      I ran a modified verion. What I had forgotten is that the ratio_distance used in the slide is always minimized compared to the initial note, not the previous note. I might not like that. First I'm going to include the logic that the slide would take, and compare what it picks that way vs what it picks minimizing the distance to the previous note. See if they agree.
+      How can I determine these two amounts?
+
+2.    Get serious about drastically lowering the amount of choices that need to be made for each note.
+      a. Take a look at note_dict and see what can be remembered from one call to another.
+      b. Use csound's built in . value to use the previous notes arguments.
+      c. Build a different structure that looks more like my Pascal samples program input. 
+      d. Don't change the structure, but find a way to automate the building of note_dict structures.      
+
+3.    Is there some way to limit the number of arguments passed so that defaults can be set and forgotten? 
+      At this point 3/4 of the function lines are dedicated to assignment statements. I hid the problem in an array. 
