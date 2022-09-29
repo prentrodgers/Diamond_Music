@@ -1,3 +1,6 @@
+@ This is the source code for a piece called Whisper Song in 53 EDO for Bass Flute, Finger Piano, cello, percussion, and winds. I wrote it in 2007.
+@ The code uses a text based front end to csound to load sample files and translate words into sound.
+@ The purpose here is to show how I made it possible to create trills bewteen just intonation chords with variable sized intervals.
 l; Name: sing53   05/23/07 10:00pm
 l; Name: sing53   05/21/07  8:28pm
 l; Name: sing53   05/21/07  2:43pm l; Name: sing53   05/20/07  5:25pm l; Name: sing53   05/15/07  7:24am
@@ -19,31 +22,6 @@ l; Name: sing53   02/24/07  9:59am l; Name: sing53   02/22/07  4:41pm l; Name: s
 l; Name: sing53   02/21/07  8:13am l; Name: sing53   02/20/07  1:35pm l; Name: sing53   02/19/07  9:45pm
 l; Name: sing53   02/16/07  3:26pm l; Name: sing53   02/14/07  4:18pm l; Name: sing53   02/13/07 10:46am
 l; Name: sing53   02/12/07  4:30pm l; Name: sing53   02/10/07  7:08am l; Name: sing53   02/03/07  1:06pm
-l; Name: sing6    12/21/06  1:05pm l; Name: sing6    12/09/06  1:09pm l; Name: sing6    11/27/06  2:31pm
-l; Name: sing6    11/24/06  1:17pm l; Name: sing6    11/17/06  4:29pm l; Name: sing6    11/03/06  6:29pm
-l; Name: sing6    10/31/06 11:11pm l; Name: sing6    10/29/06  2:33pm l; Name: sing6    10/26/06  5:10pm
-l; Name: sing6    10/25/06  3:19pm l; Name: sing6    10/20/06  3:19pm l; Name: sing6    10/10/06  4:15pm
-l; Name: sing6    10/04/06  1:38pm l; Name: sing6    09/06/06 11:14am l; Name: sing6    08/30/06  8:14pm
-l; Name: sing6    08/28/06  8:14pm l; Name: sing6    08/24/06  7:38am l; Name: sing6    08/20/06  7:38am
-l; Name: sing6    08/18/06  8:33am l; Name: sing6    08/17/06  9:29am l; Name: sing6    08/16/06  5:04pm
-l; Name: sing6    08/15/06 10:59pm l; Name: sing6    08/14/06  3:56pm l; Name: sing6    08/03/06  2:41pm
-l; Name: sing5    07/11/06  2:41pm l; Name: sing5    06/20/06  3:54pm l; Name: sing5    06/19/06  3:49pm
-l; Name: sing5    06/16/06 10:22am l; Name: sing5    06/14/06  4:23pm l; Name: sing5    06/12/06  2:41pm
-l; Name: sing4    06/11/06 10:49am l; Name: sing4    06/10/06  9:06am l; Name: sing4    06/08/06  4:55pm
-l; Name: sing4    06/07/06 12:47pm l; Name: sing4    05/04/06  7:05pm l; Name: sing4    05/03/06  7:43pm
-l; Name: sing4    05/02/06 12:13pm l; Name: sing4    04/26/06  8:45pm l; Name: sing4    04/25/06  8:52pm
-l; Name: sing4    04/18/06  8:46am l; Name: sing4    04/17/06 10:13am l; Name: sing4    04/16/06  8:20am
-l; Name: sing4    04/15/06 10:13am l; Name: sing4    04/14/06  5:54pm l; Name: sing4    04/13/06  8:56pm
-l; Name: sing4    04/01/06  9:27am l; Name: sing4    03/31/06 11:04am l; Name: sing4    03/30/06  3:26pm
-l; Name: sing4    03/29/06  1:44pm l; Name: sing4    03/28/06  4:32pm l; Name: sing3    03/27/06  2:37pm
-l; Name: sing3    03/24/06  9:58am l; Name: sing3    03/21/06  1:24pm l; Name: sing2    03/21/06  3:34pm
-l; Name: sing2    03/20/06 12:25pm l; Name: sing2    03/18/06  3:00pm l; Name: sing2    03/17/06  3:00pm
-l; Name: sing1    03/16/06  2:42pm l; Name: sing1    03/15/06  1:32pm l; Name: sing1    03/04/06 11:13am
-l; Name: sing1    02/26/06  9:16am l; Name: sing1    02/18/06 11:39am l; Name: sing1    02/17/06 10:03am
-l; Name: sing1    02/16/06  4:57pm l; Name: sing1    02/12/06  8:19am l; Name: sing1    02/11/06  7:39am
-l; Name: sing1    01/16/06  1:22pm l; Name: sing1    01/14/06 10:49am l; Name: sing1    01/07/06 10:43am
-l; Name: sing1    12/12/05  9:05am l; Name: sing1    11/18/05 10:29am l; Name: sing1    11/10/05  5:37pm
-l; Name: sing1    11/08/05  2:36pm l; Name: sing1    10/10/05  4:20pm l; Name: sing1    10/08/05  9:56am
 l;
 l; Title:        Sing in 53
 l; Some ideas
