@@ -3,3 +3,6 @@
 *.eps
 .ipynb_checkpoints/
 __pycache__/
+Python_Class_Tutorial.ipynb
+test.*
+save.txt

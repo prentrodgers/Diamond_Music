@@ -454,5 +454,5 @@ def update_gliss_table(gliss_table, current_gl):
       global current_gliss_table 
       stored_gliss = gliss_table 
       current_gliss_table = current_gl     
-      print(f'{stored_gliss.shape = }, {current_gliss_table = }')
+      # print(f'{stored_gliss.shape = }, {current_gliss_table = }')
       return current_gliss_table

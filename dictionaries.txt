@@ -36,7 +36,7 @@
       Functions in the notebook that take a note_dict with various items
             def instrument(tone, octave, duration, hold, gliss, voice_name, velocity, stereo, env, upsample, renv, gliss2, gliss3, volume):
                   Takes the listed values and returns an array ready to be sent to csound
-            chord_play - just what it says. No muss, no fuss. Takes repeats. Used to be called chord_chop 
+            chord_play - just what it says. needs note_dict values for: mode, root, octv instruments dur hold env renv repeats defaults
             scale_arpeggio - returns a list of 9 notes, a scale plus the start note on top (or bottom)
                   No repeats. can be flipped to go top to bottom
             hexad_arpeggio - Complex. Takes a mask, Takes repeats, roll (clumsy), and flip. 
