@@ -1371,3 +1371,4 @@ I took a detour and finally figured out how to get code-server to work. I now ha
             [ 44 196 130 232  64   8  12  14  32]
             [ 32 200  66 236   0  12 204 206  36]
             [ 36 204   2 224 192   0 140 142  40]]
+So, now that I have fixed the slide 
