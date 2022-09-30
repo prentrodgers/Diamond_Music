@@ -1,4 +1,4 @@
-------------------------------------------------------
+------------------------------------------------------rt
 8/5/22 To do today
 
 ✅    Make some music with the chords you made for Balloon Drum Music. Build a woodwind orchestra.
@@ -1376,7 +1376,31 @@ To do 9/29/22:
                   # save it. 
       I found the code.
       I ran a modified verion. What I had forgotten is that the ratio_distance used in the slide is always minimized compared to the initial note, not the previous note. I might not like that. First I'm going to include the logic that the slide would take, and compare what it picks that way vs what it picks minimizing the distance to the previous note. See if they agree.
-      How can I determine these two amounts?
+      How can I determine these two amounts? Absolute cents from the origin. 
+      I think I figured out a way to collect this information using absolute cents from the origin compared to the absolute cents achieved by moving to the closest ratio to each note.
+      Using this method, I should elimintate the following members of best_bridge_chord_array: ([9, 15, 16, 17, 19])
+      I need to eliminate the bad ones and save it as a numpy array. Done. I ran the collection routine again when the notebook crashed. Have to reset the specific ones to examine, because there is nothing wrong with those. Thankfully.
+      New ones ([0, 5, 10, 14, 17, 19, 26, 32])
+
+      Some of the ones that passed the examination also sound whack: #4 whipped back and forth. very whacky. It wasn't caught. I need to catch when two consecutive slides from initial result in large swings.
+      Here is number 4 slide affecting note 36:
+
+            size:        s     s    s    s    big     s  big    s     s   compared to previous note
+            slide       1.0   0.9  .81  .84   1.44 1.35 0.78  0.84   0.8
+      what it should be 1.0   0.9  .81  .84   0.72 0.67 0.78  0.84   0.8 <-- if it's a bigger move from the prev divide by 2
+            note        36    204   66  236     64    8   12    14    32
+            ratio       10/9  1/1  9/5  28/15  8/5  3/2  7/4   15/8 16/9 
+            cents       182     0  1017 1080   813  702  968   1088  996
+            What if it's a move to a very low ratio? Like 0.41 compared to the previous 0.84?
+            
+            Notice the big swing from 0.84 to 1.44. What characterizes that? 
+            prev_cent_from_initial to current_cent_from_initial is large 
+            or prev_ratio to curr_ratio is larger than 8/7 or smaller than 7/8/
+            How can I capture that concept?
+            Just changing ratio_distance (find_closest = False) doesn't help.
+            Now I'm finding the following have the flaw: ([0, 4, 5, 6, 10, 14, 17, 19, 26, 32, ])
+            What to do about it? I could fence them off, copy the good ones to a new array and be done with it. Or I could take the effort to correct the flaw and save them. Do I really need 32 separate paths through the chord changes? They all sound pretty much the same, after all, and I can't possibly use more than two or three. And I will have to do the same for the other ranks, and will end up in the same spot, perhaps. 
+            I've decided to make a go of fixing them anyway. For ten minutes or so. Two hours later I still haven't a finished version. Drop it.
 
 2.    Get serious about drastically lowering the amount of choices that need to be made for each note.
       a. Take a look at note_dict and see what can be remembered from one call to another.

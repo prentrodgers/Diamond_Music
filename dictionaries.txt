@@ -50,7 +50,7 @@
             build_voice_slide - takes a voice and a table number.
                   builds the gliss table to slide across all notes in the argument & updates the global stored_gliss and current_gliss_table. Watch out it doesn't add a new dimension. May be trouble in the axis in the concatenates.
             ratio_to_cents - pass it a decimal ratio and get the number of cents back.
-            cents_to_ratio(cents) - pass it decimal cents and get a string ratio back.
+            cents_to_ratio - pass it decimal cents and get a string ratio back.
             find_good_inversion(chord_number) - pass it the chord number in bridge_chords and it returns a list of decent inversions. Uses the data in good_slides. 
             fix_start_times - pass it a note_array and it will turn durations into the correct start time.
             init_voice_start_times - initializes all the instrument start times to zero. 
