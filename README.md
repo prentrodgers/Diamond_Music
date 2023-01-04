@@ -42,7 +42,7 @@ I've found that the simplest way to set up the minimal environment to run this c
             python3.11 -m pip install --upgrade pip
 10.   install other packages:
             pip3.11 install jupyterlab
-            # I also use these libraries, but I can't find them at the moment importlib pprint pprint copy logging os
+            # I also use these libraries, but I can't find them using pip importlib pprint copy logging os
             pip3.11 install numpy 
             pip3.11 install matplotlib
             pip3.11 install scipy
@@ -59,3 +59,17 @@ I've found that the simplest way to set up the minimal environment to run this c
 ### Installation info for toolbox:
 https://github.com/containers/toolbox            
 
+## Notes concerning the samples included in the repo
+
+I've included some instrument sample files that are required to run the csound instance and realize the piece of music it creates. Those files are:
+
+-   Oboe_Archive.zip
+-   Frn_Hrn_B_Flut_Archive.zip
+-   Clar_Bassoon_Archive.zip
+-   F_Piano_Guit_Archive.zip
+
+You will need to decompress those into a directory on your computer, and adjust the file "ball3.csd" so that it points to the right directory. In the csound file "ball3.csd" the samples are identified by their location. Currently that is only relevant to my system:
+<code>
+f605 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif" 0 0 0
+</code>
+You will need to edit "ball3.csd" to replace <code>/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif</code> with the location of that file on your computer. If you don't then csound won't work. You will have to do that with every file in the collection. 
