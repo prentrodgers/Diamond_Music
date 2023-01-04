@@ -59,4 +59,3 @@ I've found that the simplest way to set up the minimal environment to run this c
 ### Installation info for toolbox:
 https://github.com/containers/toolbox            
 
-# Installation instructions are in the jupyter notebook called Diamond_music_combined_voices.ipynb
