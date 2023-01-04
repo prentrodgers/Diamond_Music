@@ -6,3 +6,5 @@ __pycache__/
 Python_Class_Tutorial.ipynb
 test.*
 save.txt
+/python_env
+/__pycache__

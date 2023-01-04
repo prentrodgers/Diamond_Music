@@ -74,3 +74,6 @@ You will need to decompress those into a directory on your computer, and adjust 
 f605 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif" 0 0 0
 </code>
 You will need to edit "ball3.csd" to replace <code>/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif</code> with the location of that file on your computer. If you don't then csound won't work. You will have to do that with every file in the collection. 
+
+## Notes concerning where csound writes it's output 
+Csound creates some very large wave files. I recommend that you put them in <code> ~/Music/sflib </code>. That's where the two bash scripts in the repo expect them to be, and where the csound files ball3.csd and ball3c.csd put them.
