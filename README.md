@@ -13,7 +13,7 @@ If you have 16 overtones and 16 undertones on each, you end up with 256 pitches 
 
 Here is a picture of the diamond, with ratios, a note name in Sagittal notation, and the step in a 217 tone version to the octave scale. I used the 2113 in the diamond and added two more at the top and bottom to fill out the spectrum. In these notebooks I started out using that 217 tone scale, then switched to the 256 tone version for mathematical simplification. The 256 tone verion includes many duplicates, but csound doesn't care.
 
-![Diamond_31-limit](https://user-images.githubusercontent.com/16214057/187750941-36d333f3-bddc-42a2-83a0-e8103719bc77.jpg)
+![Diamond_31-limit](31-limit_cassandra.jpg)
 
 This repo contains a jupyter notebook and some python modules that can be used to send notes to an instance of Csound, a tool that takes text files as input and generates an audio file. If you do it right, it is a marvelous way to create music. My use of Csound consists of taking samples of actual instruments and creating music from the samples. But Csound can generate almost every kind of electronic synthesis every conceived. My code requires samples of musical instruments. I've included a subset of samples in this repo that include finger piano, balloon drums, guitars, and various percussion instruments. 
 
