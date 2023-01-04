@@ -3,19 +3,21 @@
 ; Album Title: Dances 
 ; Orchestra: finger piano, bass finger piano, balloon drums, flute, oboe, clarinet, bassoon, french horn 
 ; 
-<CsoundSynthesizer> 
- 
+<CsoundSynthesizer>
+
 <CsOptions> 
--o dac
+;-o dac
+-o /home/prent/Music/sflib/ball3.wav -W -G -m2 -3 
+
 ; -W -G -m2 -3 
 </CsOptions> 
- 
+
 <CsInstruments> 
  giMoved = 0 
  ; I changed the sample rate to the maximum, 24 bit audio -3 option 
  ; sr = 192000 ; my laptop audio supports this high sample rate, but not the docking station 
  sr = 44100 
- ksmps = 2; any higher than 10 and I hear clicks - use 1 for final take 
+ ksmps = 5; any higher than 10 and I hear clicks - use 1 for final take 
 ; typically save 5x processing time by increasing ksmps by 10x 
  nchnls = 2 
  instr 1 
@@ -35,27 +37,22 @@
 ; p13 2nd glissando
 ; p14 3rd glissando
 ; p15 volume
-; p16 channel
-; p17 density
-; p18 time_step
- print p2, p3, p5, p10
+ 
  if p4 = 1 goto skipVel 
- ;print p7 ; voice 
+ 
 ; ; table f2 has the iSampleType values indicating type of sample 
  iSampleType table p7,2 ; from McGill.dat col 6 1: mono 2: stereo 4: Akai MDF??? 5: Gigasample 
- ; print iSampleType,p4 
- iVelTemp = (p4 > 80 ? 80 : p4) ; make sure p4 velocity not greater than 80 
- iVel = (iVelTemp < 60 ? 60 : iVelTemp) ; nor less than 60 
+ 
+ iVelTemp = (p4 > 90 ? 90 : p4) ; make sure p4 velocity not greater than 90
+ iVel = (iVelTemp < 50 ? 50 : iVelTemp) ; nor less than 50 
  iVoicet = (iSampleType = 5 ? (p7 + (iVel - 60)/2) : p7) ; alter voice if SampleType is 5, otherwise don't touch it 
  iVoice = round(iVoicet) 
- ; print iVoice, iVel 
+ 
 ; ; table f1 has the start location of the sample tables control functions 
  iSampWaveTable table iVoice,1 ; find the location of the sample wave tables base on input p7 
- ; print iSampWaveTable ; 5 - location of the first set of samples, the most quiet ones 
- ioct = p6+1 ; convert from my octave form to midi standard 
- iMIDInumber = 12*(ioct) + int(p5/18) ; convert from octave/pitch to a MIDI note number to pick ftable 
- ; print p5,p6,ioct,iMIDInumber 
-; ; if (root is 72, 72/12 = 6) if (root is 216, 216/12 = 18) 
+ ipitch table p5, 3 ; convert note number 0-213 (or whatever the root is) to oct.fract format - generated table of note cents f 3 
+ ioct = p6 
+ iMIDInumber = int(12 * ipitch / .12) + 12 * ioct
  iFtableTemp table iMIDInumber, iSampWaveTable ; map midi note number to the correct ftable for that note  
  iFtable = iFtableTemp + (p11 < 128 ? p11 : p11-256) ; up or down sample by parameter 11 modulo 256 
 ; The next section added on 5/4/22 to ensure that a sample file out of range is not selected. 
@@ -81,8 +78,8 @@
  printf_i "voice: %i. switched sample from %i to %i. Total moved so far: %i\n", 1, iVoice, iFtableTemp, iFtable, giMoved 
  iFound: 
  
- iamp = ampdb(iVel) * p15 / 5 ; velocity input is 60-80 - convert to amplitude 
- print p16, p17, p18
+ iamp = ampdb(iVel) * p15 / 5 ; volume input is 60-80 - convert to amplitude 
+ 
  ; End of modification 5/4/22 
  i9 = 298-p9 ; valid envelope table number are 298, 297, 296, 295 etc. - left channel 
  i12 = 298-p12 ; valid envelope table number are 298, 297, 296, 295 etc. - right channel 
@@ -98,7 +95,7 @@
  iloop table iFtable-(3+iSampWaveTable), 3 + iSampWaveTable ; get loop or not 
  ibasoct = ibasno/12 ; find the base octave 
  ibascps = cpsoct(ibasoct+(icent/1200)) ; flatten amount in icent table 
- ipitch table p5, 3 ; convert note number 0-213 (or whatever the root is) to oct.fract format - generated table of note cents f 3 
+ 
  inote = cpspch(ioct + ipitch) ; note plus the decimal fraction of a note from table ipitch is in divisions of the octave
  kcps = cpspch(ioct + ipitch) ; convert oct.fract to Hz at krate 
  if i10 > 0 then
@@ -113,7 +110,7 @@
  else
       kcps2 = kcps1
  endif
- print iFtable, iSampleType 
+ ; print p5, iMIDInumber, iFtable
  if iSampleType = 4 goto akaimono 
  if iSampleType = 1 goto noloopm 
  if iloop = 0 goto noloops 
@@ -142,37 +139,12 @@
  outs a1 * kpan_l ,a2 * kpan_r 
  skipVel: 
  endin 
- 
-</CsInstruments> 
- 
+
+</CsInstruments>
+
 <CsScore> 
-; cents for each step in the scale 213 partch tonality diamond to the 31-limit
-; f3 0 256 -2 
-; 0.0016727 0.0033617 ; ['104/103', '52/51'] I used to have these
-; 0.0054964 0.0056767 0.0058692 0.0060751 0.0062961 0.0065337 0.0067900 0.0070672 
-; 0.0073681 0.0076956 0.0080537 0.0084467 0.0088801 0.0093603 0.0098955 0.0104955 0.0111731 0.0115458 
-; 0.0119443 0.0124712 0.0128298 0.0133248 0.0138573 0.0144353 0.0150637 0.0157493 0.0159920 0.0165004 
-; 0.0170424 0.0173268 0.0176210 0.0182404 0.0189050 0.0192558 0.0196198 0.0203910 0.0212253 0.0216687 
-; 0.0221309 0.0241174 0.0249171 0.0241961 0.0247741 0.0253805 0.0256950 0.0258874 0.0266871 0.0275378 
-; 0.0277591 0.0281358 0.0289210 0.0294135 0.0297513 0.0301847 0.0304508 0.0315641 0.0327622 0.0330761 
-; 0.0336130 0.0340552 0.0347408 0.0352477 0.0354547 0.0359472 0.0365825 0.0369747 0.0372408 0.0374333 
-; 0.0386314 0.0399090 0.0401303 0.0404442 0.0409244 0.0417508 0.0424364 0.0427373 0.0435084 0.0441278 
-; 0.0443081 0.0446363 0.0454214 0.0459994 0.0464428 0.0467936 0.0470781 0.0475114 0.0478259 0.0498045 
-; 0.0516761 0.0519551 0.0524319 0.0525745 0.0528687 0.0532428 0.0536951 0.0543015 0.0551318 0.0556737 
-; 0.0558796 0.0563382 0.0568717 0.0571726 0.0582512 0.0591648 0.0593718 0.0597000 0.0603000 0.0606282 
-; 0.0608352 0.0617488 0.0628274 0.0631283 0.0636618 0.0641204 0.0643263 0.0648682 0.0656985 0.0663049 
-; 0.0667672 0.0671313 0.0674255 0.0676681 0.0680449 0.0683249 0.0701955 0.0721741 0.0724886 0.0729219 
-; 0.0732064 0.0735572 0.0740006 0.0745786 0.0753637 0.0756919 0.0758722 0.0764916 0.0772627 0.0775636 
-; 0.0782492 0.0790756 0.0795558 0.0798697 0.0800910 0.0813686 0.0825667 0.0827592 0.0830253 0.0834175 
-; 0.0840528 0.0845453 0.0847524 0.0852592 0.0859448 0.0863870 0.0869249 0.0872478 0.0884359 0.0895492 
-; 0.0898153 0.0902487 0.0905865 0.0910790 0.0918642 0.0922409 0.0924622 0.0933129 0.0941126 0.0943050 
-; 0.0946195 0.0952259 0.0958039 0.0960829 0.0968826 0.0978691 0.0983313 0.0987747 0.0996090 0.1003802 
-; 0.1007442 0.1010950 0.1017596 0.1024790 0.1026732 0.1029577 0.1034996 0.1040080 0.1042507 0.1049363 
-; 0.1055647 0.1061427 0.1066762 0.1071702 0.1076288 0.1080557 0.1084542 0.1088269 0.1095045 0.1101045 
-; 0.1106397 0.1111199 0.1115533 0.1119463 0.1124044 0.1126319 0.1129328 0.1132100 0.1134663 0.1137039 
-; 0.1139249 0.1141308 0.1143243 0.1145036 0.1200000 
-f3.0 0.0 256.0 -2.0 0.0 0.0104955 0.020391 0.0297513 0.0386314 0.0470781 0.0551318 0.0628274 0.0701955 0.0772627 0.0840528 0.0905865 0.0968826 0.1029577 0.1088269 0.1145036 0.1095045 0.0 0.0098955 0.0192558 0.0281358 0.0365825 0.0446363 0.0523319 0.0597 0.0667672 0.0735572 0.080091 0.086387 0.0924622 0.0983313 0.104008 0.099609 0.1101045 0.0 0.0093603 0.0182404 0.0266871 0.0347408 0.0424364 0.0498045 0.0568717 0.0636618 0.0701955 0.0764916 0.0825667 0.0884359 0.0941126 0.0902487 0.1007442 0.1106397 0.0 0.0088801 0.0173268 0.0253805 0.0330761 0.0404442 0.0475114 0.0543015 0.0608352 0.0671313 0.0732064 0.0790756 0.0847523 0.0813686 0.0918642 0.1017596 0.1111199 0.0 0.0084467 0.0165004 0.0241961 0.0315641 0.0386314 0.0454214 0.0519551 0.0582512 0.0643263 0.0701955 0.0758722 0.0729219 0.0834175 0.0933129 0.1026732 0.1115533 0.0 0.0080537 0.0157493 0.0231174 0.0301847 0.0369747 0.0435084 0.0498045 0.0558796 0.0617488 0.0674255 0.0648682 0.0753637 0.0852592 0.0946195 0.1034996 0.1119463 0.0 0.0076956 0.0150637 0.0221309 0.028921 0.0354547 0.0417508 0.0478259 0.0536951 0.0593718 0.0571726 0.0676681 0.0775636 0.0869239 0.0958039 0.1042507 0.1123044 0.0 0.0073681 0.0144353 0.0212253 0.0277591 0.0340552 0.0401303 0.0459994 0.0516761 0.0498045 0.0603 0.0701955 0.0795558 0.0884359 0.0968826 0.1049363 0.1126319 0.0 0.0070672 0.0138573 0.020391 0.0266871 0.0327622 0.0386314 0.0443081 0.0427373 0.0532328 0.0631283 0.0724886 0.0813686 0.0898153 0.0978691 0.1055647 0.1129328 0.0 0.00679 0.0133238 0.0196198 0.025695 0.0315641 0.0372408 0.0359472 0.0464428 0.0563382 0.0656985 0.0745786 0.0830253 0.091079 0.0987747 0.1061427 0.11321 0.0 0.0065337 0.0128298 0.018905 0.0247741 0.0304508 0.0294135 0.039909 0.0498045 0.0591648 0.0680449 0.0764916 0.0845453 0.0922409 0.099609 0.1066762 0.1134663 0.0 0.0062961 0.0123712 0.0182404 0.0239171 0.0231174 0.033613 0.0435084 0.0528687 0.0617488 0.0701955 0.0782492 0.0859448 0.0933129 0.1003802 0.1071702 0.1137039 0.0 0.0060751 0.0119443 0.017621 0.0170423 0.0275378 0.0374333 0.0467936 0.0556737 0.0641204 0.0721741 0.0798697 0.0872378 0.094305 0.101095 0.1076288 0.1139249 0.0 0.0058692 0.0115458 0.0111731 0.0216687 0.0315641 0.0409244 0.0498045 0.0582512 0.0663049 0.0740006 0.0813686 0.0884359 0.0952259 0.1017596 0.1080557 0.1141308 0.0 0.0056767 0.0054964 0.015992 0.0258874 0.0352477 0.0441278 0.0525745 0.0606282 0.0683239 0.0756919 0.0827592 0.0895492 0.0960829 0.102379 0.1084542 0.1143233 0.0 
-; 0.1166383  0.1183273 ; ['51/26' '103/52'] I used to have these also
+f3.0 0.0 256.0 -2.0 0.0 0.0104955 0.020391 0.0297513 0.0386314 0.0470781 0.0551318 0.0628274 0.0701955 0.0772627 0.0840528 0.0905865 0.0968826 0.1029577 0.1088269 0.1145036 0.1095045 0.0 0.0098955 0.0192558 0.0281358 0.0365825 0.0446363 0.0523319 0.0597 0.0667672 0.0735572 0.080091 0.086387 0.0924622 0.0983313 0.104008 0.099609 0.1101045 0.0 0.0093603 0.0182404 0.0266871 0.0347408 0.0424364 0.0498045 0.0568717 0.0636618 0.0701955 0.0764916 0.0825667 0.0884359 0.0941126 0.0902487 0.1007442 0.1106397 0.0 0.0088801 0.0173268 0.0253805 0.0330761 0.0404442 0.0475114 0.0543015 0.0608352 0.0671313 0.0732064 0.0790756 0.0847523 0.0813686 0.0918642 0.1017596 0.1111199 0.0 0.0084467 0.0165004 0.0241961 0.0315641 0.0386314 0.0454214 0.0519551 0.0582512 0.0643263 0.0701955 0.0758722 0.0729219 0.0834175 0.0933129 0.1026732 0.1115533 0.0 0.0080537 0.0157493 0.0231174 0.0301847 0.0369747 0.0435084 0.0498045 0.0558796 0.0617488 0.0674255 0.0648682 0.0753637 0.0852592 0.0946195 0.1034996 0.1119463 0.0 0.0076956 0.0150637 0.0221309 0.028921 0.0354547 0.0417508 0.0478259 0.0536951 0.0593718 0.0571726 0.0676681 0.0775636 0.0869239 0.0958039 0.1042507 0.1123044 0.0 0.0073681 0.0144353 0.0212253 0.0277591 0.0340552 0.0401303 0.0459994 0.0516761 0.0498045 0.0603 0.0701955 0.0795558 0.0884359 0.0968826 0.1049363 0.1126319 0.0 0.0070672 0.0138573 0.020391 0.0266871 0.0327622 0.0386314 0.0443081 0.0427373 0.0532328 0.0631283 0.0724886 0.0813686 0.0898153 0.0978691 0.1055647 0.1129328 0.0 0.00679 0.0133238 0.0196198 0.025695 0.0315641 0.0372408 0.0359472 0.0464428 0.0563382 0.0656985 0.0745786 0.0830253 0.091079 0.0987747 0.1061427 0.11321 0.0 0.0065337 0.0128298 0.018905 0.0247741 0.0304508 0.0294135 0.039909 0.0498045 0.0591648 0.0680449 0.0764916 0.0845453 0.0922409 0.099609 0.1066762 0.1134663 0.0 0.0062961 0.0123712 0.0182404 0.0239171 0.0231174 0.033613 0.0435084 0.0528687 0.0617488 0.0701955 0.0782492 0.0859448 0.0933129 0.1003802 0.1071702 0.1137039 0.0 0.0060751 0.0119443 0.017621 0.0170423 0.0275378 0.0374333 0.0467936 0.0556737 0.0641204 0.0721741 0.0798697 0.0872378 0.094305 0.101095 0.1076288 0.1139249 0.0 0.0058692 0.0115458 0.0111731 0.0216687 0.0315641 0.0409244 0.0498045 0.0582512 0.0663049 0.0740006 0.0813686 0.0884359 0.0952259 0.1017596 0.1080557 0.1141308 0.0 0.0056767 0.0054964 0.015992 0.0258874 0.0352477 0.0441278 0.0525745 0.0606282 0.0683239 0.0756919 0.0827592 0.0895492 0.0960829 0.102379 0.1084542 0.1143233 0.12 
+; 0.1166383  0.1183273 ; ['51/26' '103/52'] At some point in the past I had these points also
 ; 
 f4 0 1025 9 .25 1 0 ;The first quadrant of a sine for panning 
 ; The glissandi are note being dynamically generated as needed starting at 800 and going up
@@ -181,16 +153,28 @@ f4 0 1025 9 .25 1 0 ;The first quadrant of a sine for panning
 ;#7 0 siz 
 ;#6 0 siz exp min values mid val max vals mid vals min val mid val max 
 f298 0 1025 6 0 1 .5 1 1 496 1 496 1 15 .5 15 0.0 ; e0 - Attack and sustain with a relatively sharp ending 
-f297 0 1025 6 0 1 .9 1 1 486 1 486 1 25 .5 25 0.0 ; e1 - Attack and sustain with a relatively sharp ending 
+;f297 0 1025 6 0 1 .9 1 1 486 1 486 1 25 .5 25 0.0 ; e1 - Attack and sustain with a relatively sharp ending 
+f297 0 1025 6 0 4 .5 4 1 500 1 500 1 4 .5 4 0.0 ; e1 - Attack and sustain with a relatively sharp ending 
 ;#5 0 siz exp start take reach take reach 
-f296 0 513 5 1024 512 1 ; e2 - exponential - dead piano 
+; f296 0 512 5 1024 512 1 ; e2 - exponential - dead piano 
+;           +-- cubic polynomials
+;           | +-- start at 0
+;           | | +-- take 2 to reach
+;           | | | +-- reach 1/2 volumef296
+;           | | | |  +-- take 2 to full volume
+;           | | | |  | +-- reach full volume
+;           | | | |  | | +-- take 126
+;           | | | |  | | |   +-- half point
+f296 0 256  6 0 2 .5 2 1 32 0.6 32 0.25 32 0.125 32 0.06 32 0.001
+; f296 0 512 5 1024 512 1 ; e2 - exponential - dead piano 
 ;#6 0 siz exp min values mid val max val mid val min val mid val max val mid val min 
 f295 0 1025 6 0 64 .5 64 1 128 .6 128 .3 128 .5 128 .6 192 .3 192 0 ; e3 big hump, small hump 
 f294 0 1025 6 0 64 .15 64 .3 128 .25 128 .2 128 .6 128 1 192 .5 192 0 ; e4 small hump, big hump 
 f293 0 1025 6 0 1 .5 1 1 447 .99 447 .98 64 0.5 64 0 ;e5 default woodwind envelope 
 f292 0 1025 6 0 1 .5 1 1 447 0.60 447 0.20 32 0.21 32 0.22 32 0.11 32 0.00 ; e6 moving away slowly 
 f291 0 1025 6 0 1 .5 1 1 128 0.60 128 0.20 256 0.15 254 0.10 128 0.05 128 0.00 ; e7 moving away faster 
-f290 0 1025 6 0 2 .5 2 1 501 .6 483 .3 18 .15 18 0 ; e8 hit and drop most 
+;f290 0 1025 6 0 2 .5 2 1 501 .6 483 .3 18 .15 18 0 ; e8 hit and drop most 
+f290 0 256  6 0 1 .5 1 1 128 .5 126 0 ; e8 hit and drop most 
 f289 0 1025 6 0 1 .3 1 .6 479 .8 479 1 32 .5 32 0 ; e9 Start moderately and build, abrupt end 
 f288 0 1025 6 0 64 .40 448 1 448 .6 64 0 ; e10 One long hump in the middle 
 ;           +-- cubic polynomials
@@ -207,15 +191,34 @@ f288 0 1025 6 0 64 .40 448 1 448 .6 64 0 ; e10 One long hump in the middle
 ;           | | | |  | | |   |   |    |  |   +-- 1/2 volume
 ;           | | | |  | | |   |   |    |  |   | +-- take 16 to reach
 ;           | | | |  | | |   |   |    |  |   | |  +-- zero
-;           | | | |  | | |   |   |    |  |   | |  | stay there till the end
-f287 0 1025 6 0 1 .5 1 1 368 .99 368 .98 16 .5 16 0 127 0 127 0 ; e11 hit and sustain 3/4 the normal length 
-f286 0 1025 6 0 1 .5 1 1 303 .99 303 .98 16 .5 16 0 192 0 192 0 ; e12 hit and sustain 2/3 the normal length 
-f285 0 1025 6 0 1 .5 1 1 248 .99 248 .98 16 .5 16 0 247 0 247 0 ; e13 hit and sustain 1/2 the normal length 
-f284 0 1025 6 0 1 .5 1 1 124 .99 124 .98  4 .5  4 0 384 0 384 0 ; e14 hit and sustain 1/4 the normal length 
-f283 0 1025 6 0 1 .5 1 1 95 .99 95 .98 1 .5 1 0 420 0 420 0 ; e15 hit and sustain 1/6 the normal length 
+;           | | | |  | | |   |   |    |  |   | |  | stay there till the end - csound pads with zeros automatically
+f287 0 1025 6 0 1 .5 1 1 368 .99 368 .98 16 .5 16 0  ; e11 hit and sustain 3/4 the normal length 
+;               1    1   303     303     16    16
+f286 0 1025 6 0 1 .5 1 1 323 .99 323 .98 16 .5 16 0  ; e12 hit and sustain 2/3 the normal length 
+f285 0 1025 6 0 1 .5 1 1 248 .99 248 .98 16 .5 16 0  ; e13 hit and sustain 1/2 the normal length 
+f284 0 1025 6 0 1 .5 1 1 124 .99 124 .98  4 .5  4 0  ; e14 hit and sustain 1/4 the normal length 
+f283 0 1025 6 0 1 .5 1 1 84 .99 84 .98 1 .5 1 0  ; e15 hit and sustain 1/5 the normal length 
 f282 0 1025 6 0 2 .2 2 .4 477 .7 479 1 32 .5 32 0 ; e16 sustain piano sound 
 f281 0 1025 6 0 1 .1 1 .2 479 .6 479 1 32 .5 32 0 ; e17 sustain guitar sound 
-f280 0 1025 6 1 64 .7 64 .4 64 .4 64 .4 384 .7 352 1 16 .5 16 0 ; e18 Sharp attack, then less quiet, build to end 
+;f280 0 1025 6 1 64 .7 64 .4 64 .4 64 .4 384 .7 352 1 16 .5 16 0 ; e18 Sharp attack, then less quiet, build to end 
+;           +-- cubic polynomials
+;           | +-- start at 1 loudest with no normalization
+;           | | +-- take 64 to reach .7
+;           | | |  +-- reach 1/2 way to target
+;           | | |  |     +-- target .4
+;           | | |  |     |  +-- take 64 to stay at this level
+;           | | |  |     |  |  +-- target .4
+;           | | |  |     |  |  |  +-- take another 64 to stay
+;           | | |  |     |  |  |  |  +-- target .4
+;           | | |  |     |  |  |  |  |  +-- take 368 to reach 1/2 way to full volume
+;           | | |  |     |  |  |  |  |  |   +-- 1/2 volume
+;           | | |  |     |  |  |  |  |  |   |  +-- take 368 to reach full volume
+;           | | |  |     |  |  |  |  |  |   |  |   +-- full volume
+;           | | |  |     |  |  |  |  |  |   |  |   | +-- take 16 to reach half way to zero
+;           | | |  |     |  |  |  |  |  |   |  |   | |  +-- half way to zero
+;           | | |  |     |  |  |  |  |  |   |  |   | |  |  +-- take 16 to reach 0
+;           | | |  |     |  |  |  |  |  |   |  |   | |  |  |  +-- target zero
+f280 0 1025 6 1 64 .7 64 .4 64 .4 64 .4 368 .7 368 1 16 .5 16 0 ; e18 Sharp attack, then less quiet, build to end 
 f279 0 1025 6 0 1 .5 1 1.0 128 .7 228 .4 128 .4 28 .4 128 .5 128 .6 128 .3 126 0 ; e19 Moderate attack, then slightly quiet, build to end 
 f278 0 1025 6 0 85 0.40 85 0.80 85 0.65 85 0.50 85 0.75 85 1.00 85 0.75 85 0.50 85 0.65 85 0.8 85 0.4 89 0.0 ; e20 3 humps - biggest in middle 
 f277 0 1025 6 0 85 0.50 85 1.00 85 0.75 85 0.50 85 0.65 85 0.80 85 0.65 85 0.50 85 0.65 85 0.8 85 0.4 89 0.0 ; e21 3 humps - biggest early 
@@ -282,9 +285,12 @@ f748 0 128 -17 0 752 39 753 41 754 43 755 45 756 47 757 51 758 53 759 55 760 57 
 f749 0 64 -2 0  38  40  42  44  46  50  52  54  56  58  60  62  64  66  70  72  74 
 f750 0 64 -2 0 0   +4  0   +3  -3  -5  +10 -3  -8  -8  -5   0  +5  -3  -5  +2  +2  
 f751 0 64 -2 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+f769 0 128 -17 0 773 36 774 38 775 40 776 41 777 43 778 45 779 46 780 48 781 50 782 51 783 53 784 55 785 57 786 59 787 60 788 62 789 64 790 66 791 68 792 70 793 72 794 74 795 76 796 78 797 80 798 82 799 84 
+f770 0 64 -2 0  35  37  39  40  42  44  45  47  49  50  52  54  56  58  59  61  63  65  67  69  71  73  75  77  79  81  83 
+f771 0 64 -2 0 -9  -7  -6  -15 -4  -7  -9  +2  -5  -9  -5  +3  -6  +5  -14 -1  -1  +25 +6  -7  +2  -1  -2  +0  -2  -6  +11 
+f772 0 64 -2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 f799 0 256 -7 1 256 1 ; g0 = no change; 
 ;t 60
-; instrument #1 finger piano
 f605 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif" 0 0 0
 f606 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/e1.aif" 0 0 0
 f607 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/g1.aif" 0 0 0
@@ -310,7 +316,6 @@ f626 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/f5.aif" 0 0 0
 f627 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/g5.aif" 0 0 0
 f628 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/a5.aif" 0 0 0
 f629 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c6.aif" 0 0 0
-; instrument #2 bass finger piano
 f634 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Bass FingerP/Piano 0 G +4.aif" 0 0 0
 f635 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Bass FingerP/Piano 0 G# -30.aif" 0 0 0
 f636 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Bass FingerP/Piano 0 A# -21.aif" 0 0 0
@@ -333,13 +338,9 @@ f652 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Bass FingerP/Piano 4 D
 f653 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Bass FingerP/Piano 4 F# -2.aif" 0 0 0
 f654 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Bass FingerP/Piano 4 A +32.aif" 0 0 0
 f655 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Bass FingerP/Piano 5 D -41.aif" 0 0 0
-; instrument #3 hand drum
 f660 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition J/Balloon Drums/HandDrum1.wav" 0 0 0
-; instrument #4 medium hand drum
 f665 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition J/Balloon Drums/MediumHandDrum1.wav" 0 0 0
-; instrument #5 small balloon drum
 f670 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition J/Balloon Drums/SmallBalloonDrum5.wav" 0 0 0
-; instrument #6 bass flute with vibrato
 f675 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/B.FLUTE W-VB/B.FLTV C3.aif" 0 0 0
 f676 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/B.FLUTE W-VB/B.FLTV D3.aif" 0 0 0
 f677 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/B.FLUTE W-VB/B.FLTV E3.aif" 0 0 0
@@ -352,7 +353,6 @@ f683 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/B.FLUTE W-VB/B.FLTV E4
 f684 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/B.FLUTE W-VB/B.FLTV F#4.aif" 0 0 0
 f685 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/B.FLUTE W-VB/B.FLTV G#4.aif" 0 0 0
 f686 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/B.FLUTE W-VB/B.FLTV A#4.aif" 0 0 0
-; instrument #7 oboe
 f691 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition C/OBOE/OBOE A#3-f.aif" 0 0 0
 f692 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition C/OBOE/OBOE C4.aif" 0 0 0
 f693 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition C/OBOE/OBOE D4-f.aif" 0 0 0
@@ -368,7 +368,6 @@ f702 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition C/OBOE/OBOE A#5-f.aif" 0
 f703 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition C/OBOE/OBOE C6-f.aif" 0 0 0
 f704 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition C/OBOE/OBOE D6-f.aif" 0 0 0
 f705 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition C/OBOE/OBOE E6-f.aif" 0 0 0
-; instrument #8 clarinet
 f710 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/B- CLARINET/CLARBB D3-f.aif" 0 0 0
 f711 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/B- CLARINET/CLARBB E3-f.aif" 0 0 0
 f712 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/B- CLARINET/CLARBB F#3-f.aif" 0 0 0
@@ -387,7 +386,6 @@ f724 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/B- CLARINET/CLARBB G#5
 f725 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/B- CLARINET/CLARBB A#5-f.aif" 0 0 0
 f726 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/B- CLARINET/CLARBB C6-f.aif" 0 0 0
 f727 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/B- CLARINET/CLARBB D6-f.aif" 0 0 0
-; instrument #9 bassoon
 f732 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/BASSOON/BASSOON A#1.aif" 0 0 0
 f733 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/BASSOON/BASSOON C2.aif" 0 0 0
 f734 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/BASSOON/BASSOON D2.aif" 0 0 0
@@ -404,7 +402,6 @@ f744 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/BASSOON/BASS A#3.aif" 
 f745 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/BASSOON/BASS C4.aif" 0 0 0
 f746 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/BASSOON/BASS D4.aif" 0 0 0
 f747 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition A/BASSOON/BASS E4.aif" 0 0 0
-; instrument #10 french horn
 f752 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/FRENCH HORN/F.HORN D2.aif" 0 0 0
 f753 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/FRENCH HORN/F.HORN E2.aif" 0 0 0
 f754 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/FRENCH HORN/F.HORN F#2.aif" 0 0 0
@@ -422,9 +419,36 @@ f765 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/FRENCH HORN/F.HORN F#4
 f766 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/FRENCH HORN/F.HORN A#4.aif" 0 0 0
 f767 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/FRENCH HORN/F.HORN C5.aif" 0 0 0
 f768 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition B/FRENCH HORN/F.HORN D5-f.aif" 0 0 0
-f0 86400
-f1 0 64 -2 0 601 630 656 661 666 671 687 706 728 748 
-f2 0 64 -2 0 1 1 2 2 2 2 2 2 2 2
+f773 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H1B-19b.wav" 0 0 0
+f774 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H2C#-6.wav" 0 0 0
+f775 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H2D#-6.wav" 0 0 0
+f776 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H2E-15.wav" 0 0 0
+f777 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H2F#-2.wav" 0 0 0
+f778 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H2G#-7.wav" 0 0 0
+f779 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H2A-8.wav" 0 0 0
+f780 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H2B+3.wav" 0 0 0
+f781 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H3C#-4.wav" 0 0 0
+f782 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H3D-12.wav" 0 0 0
+f783 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H3E-11.wav" 0 0 0
+f784 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H3F#-5.wav" 0 0 0
+f785 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H3G#-6.wav" 0 0 0
+f786 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H3A#+2.wav" 0 0 0
+f787 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H3B-16.wav" 0 0 0
+f788 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H4C#+3.wav" 0 0 0
+f789 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H4D#+0.wav" 0 0 0
+f790 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H4F+24.wav" 0 0 0
+f791 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H4G+5.wav" 0 0 0
+f792 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H4A-5.wav" 0 0 0
+f793 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H4B+3.wav" 0 0 0
+f794 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5C#+0.wav" 0 0 0
+f795 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5D#+0.wav" 0 0 0
+f796 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5F+0.wav" 0 0 0
+f797 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5G+0.wav" 0 0 0
+f798 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5A-5.wav" 0 0 0
+; f799 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5B+13.wav" 0 0 0 encroches on the glissando at 799
+f0 200
+f1 0 64 -2 0 601 630 656 661 666 671 687 706 728 748 769 
+f2 0 64 -2 0 1 1 2 2 2 2 2 2 2 2 1
 ;Inst Start        Dur  Vel    Ton   Oct   Voice Stere Envlp Gliss Upsamp R-Env 2nd-gl 3rd Mult Line # ; Channel
 ;p1   p2           p3   p4     p5    p6    p7    p8    p9    p10   p11    p12   p13   p14  p15; Channel
 i1  0.0000000000    16     1     0     0     1     8     1     0     0     1     0     0    35 ;    582     1
@@ -438,200 +462,184 @@ i1 112.0000000000    16     1     0     0     1     8     1     0     0     1   
 i1 128.0000000000    16     1     0     0     1     8     1     0     0     1     0     0    35 ;    590     1
 i1 144.0000000000    16     1     0     0     1     8     1     0     0     1     0     0    35 ;    591     1
 i1 160.0000000000    16     1     0     0     1     8     1     0     0     1     0     0    35 ;    592     1
-i1 176.0000000000    16     1     0     0     1     8     1     0     0     1     0     0    35 ;    593     1
-i1  0.0000000000     1    69     0     2     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  1.0000000000     1    69    71     2     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  2.0000000000     1    69   127     2     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  3.0000000000     1    69   175     2     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  4.0000000000     1    69     0     3     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  5.0000000000     1    69    71     3     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  6.0000000000     1    69   127     3     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  7.0000000000     1    69   175     3     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  8.0000000000     1    69     0     4     1     8     1     0     0     1     0     0    35 ;    582     2
-i1  9.0000000000     1    69    71     4     1     8     1     0     0     1     0     0    35 ;    582     2
-i1 10.0000000000     1    69   127     4     1     8     1     0     0     1     0     0    35 ;    582     2
-i1 11.0000000000     1    69   175     4     1     8     1     0     0     1     0     0    35 ;    582     2
-i1 12.0000000000     1    69     0     5     1     8     1     0     0     1     0     0    35 ;    582     2
-i1 13.0000000000     1    69    71     5     1     8     1     0     0     1     0     0    35 ;    582     2
-i1 14.0000000000     1    69   127     5     1     8     1     0     0     1     0     0    35 ;    582     2
-i1 15.0000000000     1    69   175     5     1     8     1     0     0     1     0     0    35 ;    582     2
-i1 16.0000000000     1    69     0     2     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 17.0000000000     1    69    71     2     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 18.0000000000     1    69   127     2     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 19.0000000000     1    69   175     2     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 20.0000000000     1    69     0     3     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 21.0000000000     1    69    71     3     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 22.0000000000     1    69   127     3     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 23.0000000000     1    69   175     3     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 24.0000000000     1    69     0     4     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 25.0000000000     1    69    71     4     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 26.0000000000     1    69   127     4     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 27.0000000000     1    69   175     4     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 28.0000000000     1    69     0     5     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 29.0000000000     1    69    71     5     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 30.0000000000     1    69   127     5     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 31.0000000000     1    69   175     5     2     8     1     0     0     1     0     0    35 ;    583     3
-i1 32.0000000000     1    69     0     2     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 33.0000000000     1    69    71     2     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 34.0000000000     1    69   127     2     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 35.0000000000     1    69   175     2     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 36.0000000000     1    69     0     3     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 37.0000000000     1    69    71     3     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 38.0000000000     1    69   127     3     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 39.0000000000     1    69   175     3     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 40.0000000000     1    69     0     4     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 41.0000000000     1    69    71     4     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 42.0000000000     1    69   127     4     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 43.0000000000     1    69   175     4     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 44.0000000000     1    69     0     5     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 45.0000000000     1    69    71     5     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 46.0000000000     1    69   127     5     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 47.0000000000     1    69   175     5     3     8     1     0     0     1     0     0    35 ;    584     4
-i1 48.0000000000     1    69     0     2     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 49.0000000000     1    69    71     2     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 50.0000000000     1    69   127     2     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 51.0000000000     1    69   175     2     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 52.0000000000     1    69     0     3     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 53.0000000000     1    69    71     3     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 54.0000000000     1    69   127     3     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 55.0000000000     1    69   175     3     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 56.0000000000     1    69     0     4     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 57.0000000000     1    69    71     4     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 58.0000000000     1    69   127     4     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 59.0000000000     1    69   175     4     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 60.0000000000     1    69     0     5     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 61.0000000000     1    69    71     5     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 62.0000000000     1    69   127     5     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 63.0000000000     1    69   175     5     5     8     1     0     0     1     0     0    35 ;    585     6
-i1 64.0000000000     1    69     0     2     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 65.0000000000     1    69    71     2     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 66.0000000000     1    69   127     2     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 67.0000000000     1    69   175     2     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 68.0000000000     1    69     0     3     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 69.0000000000     1    69    71     3     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 70.0000000000     1    69   127     3     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 71.0000000000     1    69   175     3     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 72.0000000000     1    69     0     4     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 73.0000000000     1    69    71     4     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 74.0000000000     1    69   127     4     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 75.0000000000     1    69   175     4     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 76.0000000000     1    69     0     5     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 77.0000000000     1    69    71     5     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 78.0000000000     1    69   127     5     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 79.0000000000     1    69   175     5     6     8     1     0     0     1     0     0    35 ;    586     7
-i1 80.0000000000     1    69     0     2     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 81.0000000000     1    69    71     2     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 82.0000000000     1    69   127     2     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 83.0000000000     1    69   175     2     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 84.0000000000     1    69     0     3     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 85.0000000000     1    69    71     3     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 86.0000000000     1    69   127     3     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 87.0000000000     1    69   175     3     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 88.0000000000     1    69     0     4     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 89.0000000000     1    69    71     4     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 90.0000000000     1    69   127     4     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 91.0000000000     1    69   175     4     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 92.0000000000     1    69     0     5     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 93.0000000000     1    69    71     5     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 94.0000000000     1    69   127     5     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 95.0000000000     1    69   175     5     7     8     1     0     0     1     0     0    35 ;    587     8
-i1 96.0000000000     1    69     0     2     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 97.0000000000     1    69    71     2     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 98.0000000000     1    69   127     2     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 99.0000000000     1    69   175     2     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 100.0000000000     1    69     0     3     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 101.0000000000     1    69    71     3     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 102.0000000000     1    69   127     3     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 103.0000000000     1    69   175     3     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 104.0000000000     1    69     0     4     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 105.0000000000     1    69    71     4     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 106.0000000000     1    69   127     4     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 107.0000000000     1    69   175     4     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 108.0000000000     1    69     0     5     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 109.0000000000     1    69    71     5     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 110.0000000000     1    69   127     5     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 111.0000000000     1    69   175     5     8     8     1     0     0     1     0     0    35 ;    588     9
-i1 112.0000000000     1    69     0     2     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 113.0000000000     1    69    71     2     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 114.0000000000     1    69   127     2     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 115.0000000000     1    69   175     2     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 116.0000000000     1    69     0     3     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 117.0000000000     1    69    71     3     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 118.0000000000     1    69   127     3     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 119.0000000000     1    69   175     3     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 120.0000000000     1    69     0     4     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 121.0000000000     1    69    71     4     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 122.0000000000     1    69   127     4     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 123.0000000000     1    69   175     4     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 124.0000000000     1    69     0     5     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 125.0000000000     1    69    71     5     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 126.0000000000     1    69   127     5     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 127.0000000000     1    69   175     5     9     8     1     0     0     1     0     0    35 ;    589    10
-i1 128.0000000000     1    69     0     2    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 129.0000000000     1    69    71     2    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 130.0000000000     1    69   127     2    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 131.0000000000     1    69   175     2    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 132.0000000000     1    69     0     3    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 133.0000000000     1    69    71     3    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 134.0000000000     1    69   127     3    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 135.0000000000     1    69   175     3    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 136.0000000000     1    69     0     4    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 137.0000000000     1    69    71     4    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 138.0000000000     1    69   127     4    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 139.0000000000     1    69   175     4    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 140.0000000000     1    69     0     5    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 141.0000000000     1    69    71     5    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 142.0000000000     1    69   127     5    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 143.0000000000     1    69   175     5    10     8     1     0     0     1     0     0    35 ;    590    11
-i1 144.0000000000     1    69     0     2    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 145.0000000000     1    69    71     2    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 146.0000000000     1    69   127     2    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 147.0000000000     1    69   175     2    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 148.0000000000     1    69     0     3    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 149.0000000000     1    69    71     3    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 150.0000000000     1    69   127     3    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 151.0000000000     1    69   175     3    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 152.0000000000     1    69     0     4    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 153.0000000000     1    69    71     4    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 154.0000000000     1    69   127     4    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 155.0000000000     1    69   175     4    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 156.0000000000     1    69     0     5    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 157.0000000000     1    69    71     5    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 158.0000000000     1    69   127     5    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 159.0000000000     1    69   175     5    11     8     1     0     0     1     0     0    35 ;    591    12
-i1 160.0000000000     1    69     0     2    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 161.0000000000     1    69    71     2    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 162.0000000000     1    69   127     2    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 163.0000000000     1    69   175     2    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 164.0000000000     1    69     0     3    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 165.0000000000     1    69    71     3    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 166.0000000000     1    69   127     3    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 167.0000000000     1    69   175     3    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 168.0000000000     1    69     0     4    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 169.0000000000     1    69    71     4    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 170.0000000000     1    69   127     4    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 171.0000000000     1    69   175     4    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 172.0000000000     1    69     0     5    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 173.0000000000     1    69    71     5    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 174.0000000000     1    69   127     5    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 175.0000000000     1    69   175     5    12     8     1     0     0     1     0     0    35 ;    592    13
-i1 176.0000000000     1    69     0     2    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 177.0000000000     1    69    71     2    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 178.0000000000     1    69   127     2    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 179.0000000000     1    69   175     2    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 180.0000000000     1    69     0     3    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 181.0000000000     1    69    71     3    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 182.0000000000     1    69   127     3    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 183.0000000000     1    69   175     3    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 184.0000000000     1    69     0     4    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 185.0000000000     1    69    71     4    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 186.0000000000     1    69   127     4    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 187.0000000000     1    69   175     4    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 188.0000000000     1    69     0     5    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 189.0000000000     1    69    71     5    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 190.0000000000     1    69   127     5    13     8     1     0     0     1     0     0    35 ;    593    14
-i1 191.0000000000     1    69   175     5    13     8     1     0     0     1     0     0    35 ;    593    14
-; t0 initial_tempo times_in_beats next_tempo time_in_beats
-t0 3600
+i1  0.0000000000     1    69     0     2     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  1.0000000000     1    69    71     2     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  2.0000000000     1    69   127     2     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  3.0000000000     1    69   175     2     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  4.0000000000     1    69     0     3     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  5.0000000000     1    69    71     3     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  6.0000000000     1    69   127     3     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  7.0000000000     1    69   175     3     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  8.0000000000     1    69     0     4     1     8     8     0     0     8     0     0    35 ;    582     2
+i1  9.0000000000     1    69    71     4     1     8     8     0     0     8     0     0    35 ;    582     2
+i1 10.0000000000     1    69   127     4     1     8     8     0     0     8     0     0    35 ;    582     2
+i1 11.0000000000     1    69   175     4     1     8     8     0     0     8     0     0    35 ;    582     2
+i1 12.0000000000     1    69     0     5     1     8     8     0     0     8     0     0    35 ;    582     2
+i1 13.0000000000     1    69    71     5     1     8     8     0     0     8     0     0    35 ;    582     2
+i1 14.0000000000     1    69   127     5     1     8     8     0     0     8     0     0    35 ;    582     2
+i1 15.0000000000     1    69   175     5     1     8     8     0     0     8     0     0    35 ;    582     2
+i1 16.0000000000     1    69     0     2     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 17.0000000000     1    69    71     2     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 18.0000000000     1    69   127     2     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 19.0000000000     1    69   175     2     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 20.0000000000     1    69     0     3     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 21.0000000000     1    69    71     3     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 22.0000000000     1    69   127     3     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 23.0000000000     1    69   175     3     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 24.0000000000     1    69     0     4     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 25.0000000000     1    69    71     4     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 26.0000000000     1    69   127     4     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 27.0000000000     1    69   175     4     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 28.0000000000     1    69     0     5     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 29.0000000000     1    69    71     5     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 30.0000000000     1    69   127     5     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 31.0000000000     1    69   175     5     2     8     8     0     0     8     0     0    35 ;    583     3
+i1 32.0000000000     1    69     0     2     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 33.0000000000     1    69    71     2     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 34.0000000000     1    69   127     2     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 35.0000000000     1    69   175     2     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 36.0000000000     1    69     0     3     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 37.0000000000     1    69    71     3     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 38.0000000000     1    69   127     3     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 39.0000000000     1    69   175     3     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 40.0000000000     1    69     0     4     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 41.0000000000     1    69    71     4     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 42.0000000000     1    69   127     4     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 43.0000000000     1    69   175     4     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 44.0000000000     1    69     0     5     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 45.0000000000     1    69    71     5     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 46.0000000000     1    69   127     5     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 47.0000000000     1    69   175     5     3     8     8     0     0     8     0     0    35 ;    584     4
+i1 48.0000000000     1    69     0     2     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 49.0000000000     1    69    71     2     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 50.0000000000     1    69   127     2     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 51.0000000000     1    69   175     2     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 52.0000000000     1    69     0     3     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 53.0000000000     1    69    71     3     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 54.0000000000     1    69   127     3     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 55.0000000000     1    69   175     3     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 56.0000000000     1    69     0     4     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 57.0000000000     1    69    71     4     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 58.0000000000     1    69   127     4     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 59.0000000000     1    69   175     4     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 60.0000000000     1    69     0     5     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 61.0000000000     1    69    71     5     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 62.0000000000     1    69   127     5     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 63.0000000000     1    69   175     5     4     8     8     0     0     8     0     0    35 ;    585     5
+i1 64.0000000000     1    69     0     2     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 65.0000000000     1    69    71     2     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 66.0000000000     1    69   127     2     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 67.0000000000     1    69   175     2     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 68.0000000000     1    69     0     3     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 69.0000000000     1    69    71     3     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 70.0000000000     1    69   127     3     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 71.0000000000     1    69   175     3     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 72.0000000000     1    69     0     4     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 73.0000000000     1    69    71     4     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 74.0000000000     1    69   127     4     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 75.0000000000     1    69   175     4     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 76.0000000000     1    69     0     5     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 77.0000000000     1    69    71     5     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 78.0000000000     1    69   127     5     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 79.0000000000     1    69   175     5     5     8     8     0     0     8     0     0    35 ;    586     6
+i1 80.0000000000     1    69     0     2     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 81.0000000000     1    69    71     2     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 82.0000000000     1    69   127     2     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 83.0000000000     1    69   175     2     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 84.0000000000     1    69     0     3     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 85.0000000000     1    69    71     3     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 86.0000000000     1    69   127     3     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 87.0000000000     1    69   175     3     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 88.0000000000     1    69     0     4     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 89.0000000000     1    69    71     4     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 90.0000000000     1    69   127     4     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 91.0000000000     1    69   175     4     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 92.0000000000     1    69     0     5     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 93.0000000000     1    69    71     5     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 94.0000000000     1    69   127     5     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 95.0000000000     1    69   175     5     6     8     8     0     0     8     0     0    35 ;    587     7
+i1 96.0000000000     1    69     0     2     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 97.0000000000     1    69    71     2     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 98.0000000000     1    69   127     2     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 99.0000000000     1    69   175     2     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 100.0000000000     1    69     0     3     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 101.0000000000     1    69    71     3     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 102.0000000000     1    69   127     3     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 103.0000000000     1    69   175     3     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 104.0000000000     1    69     0     4     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 105.0000000000     1    69    71     4     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 106.0000000000     1    69   127     4     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 107.0000000000     1    69   175     4     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 108.0000000000     1    69     0     5     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 109.0000000000     1    69    71     5     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 110.0000000000     1    69   127     5     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 111.0000000000     1    69   175     5     7     8     8     0     0     8     0     0    35 ;    588     8
+i1 112.0000000000     1    69     0     2     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 113.0000000000     1    69    71     2     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 114.0000000000     1    69   127     2     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 115.0000000000     1    69   175     2     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 116.0000000000     1    69     0     3     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 117.0000000000     1    69    71     3     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 118.0000000000     1    69   127     3     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 119.0000000000     1    69   175     3     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 120.0000000000     1    69     0     4     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 121.0000000000     1    69    71     4     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 122.0000000000     1    69   127     4     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 123.0000000000     1    69   175     4     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 124.0000000000     1    69     0     5     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 125.0000000000     1    69    71     5     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 126.0000000000     1    69   127     5     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 127.0000000000     1    69   175     5     8     8     8     0     0     8     0     0    35 ;    589     9
+i1 128.0000000000     1    69     0     2     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 129.0000000000     1    69    71     2     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 130.0000000000     1    69   127     2     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 131.0000000000     1    69   175     2     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 132.0000000000     1    69     0     3     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 133.0000000000     1    69    71     3     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 134.0000000000     1    69   127     3     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 135.0000000000     1    69   175     3     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 136.0000000000     1    69     0     4     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 137.0000000000     1    69    71     4     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 138.0000000000     1    69   127     4     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 139.0000000000     1    69   175     4     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 140.0000000000     1    69     0     5     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 141.0000000000     1    69    71     5     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 142.0000000000     1    69   127     5     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 143.0000000000     1    69   175     5     9     8     8     0     0     8     0     0    35 ;    590    10
+i1 144.0000000000     1    69     0     2    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 145.0000000000     1    69    71     2    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 146.0000000000     1    69   127     2    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 147.0000000000     1    69   175     2    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 148.0000000000     1    69     0     3    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 149.0000000000     1    69    71     3    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 150.0000000000     1    69   127     3    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 151.0000000000     1    69   175     3    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 152.0000000000     1    69     0     4    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 153.0000000000     1    69    71     4    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 154.0000000000     1    69   127     4    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 155.0000000000     1    69   175     4    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 156.0000000000     1    69     0     5    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 157.0000000000     1    69    71     5    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 158.0000000000     1    69   127     5    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 159.0000000000     1    69   175     5    10     8     8     0     0     8     0     0    35 ;    591    11
+i1 160.0000000000     1    69     0     2    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 161.0000000000     1    69    71     2    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 162.0000000000     1    69   127     2    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 163.0000000000     1    69   175     2    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 164.0000000000     1    69     0     3    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 165.0000000000     1    69    71     3    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 166.0000000000     1    69   127     3    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 167.0000000000     1    69   175     3    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 168.0000000000     1    69     0     4    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 169.0000000000     1    69    71     4    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 170.0000000000     1    69   127     4    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 171.0000000000     1    69   175     4    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 172.0000000000     1    69     0     5    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 173.0000000000     1    69    71     5    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 174.0000000000     1    69   127     5    11     8     8     0     0     8     0     0    35 ;    592    12
+i1 175.0000000000     1    69   175     5    11     8     8     0     0     8     0     0    35 ;    592    12
+t0     60
 </CsScore>
 </CsoundSynthesizer>
+
+;
