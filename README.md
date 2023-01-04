@@ -1,21 +1,22 @@
 # Diamond_Music
-Code and notebooks for working with Harry Partch's Tonality Diamond using Csound
+## Code and notebooks for working with Harry Partch's Tonality Diamond using Csound
 
-Specifically, it's a repo for code that simplifies creating music using a Tonality Diamond to the 31-limit. Simplify might be too strong a term here. In order to use this, you will need some pretty awesome Csound chops, and a fair to middling Python skill set. A degree in music composition would help. Fortunately, that's my talent stack. 
+Specifically, it's a repo for code that simplifies creating music using a Tonality Diamond to the 31-limit. Simplify might be too strong a term here. In order to use this, you will need some pretty awesome Csound chops, and a fair to middling Jupyter Notebook and Python skill set. A degree in music composition would help. Fortunately, that's my talent stack. 
 
 The tonality diamond is a structure that is built using the overtones of a root key. The Wiki page has more information here: 
 
 [Wiki Tonality Diamond Entry](https://en.wikipedia.org/wiki/Tonality_diamond)
 
 Harry Partch first created a diamond with the overtones from 1 to 11. That is, he used pitches constructed from the ratios 1/1, 9/8, 5/4, 11/8, 3/2, 7/4. These notes are close to the 12 tone equal G, A, B, C+, D, F-, where minus is just a bit below natural, but not quite as low as a flat. He then constructed undertones on those overtones. An undertone is the inverse of an overtone, made by flipping the ratios upside down, so you have 2/1, 16/9, 8/5, 16/11, 4/3, 8/7. The overtone ratios are often notated as 8,9,10,11,12,14/8 and the undertones as 16/8, 9, 10, 11, 12, 14. 
+
 I extended the Tonality Diamond first to the 15-limit, then the 31-limit, meaning the overtones from 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31/16, and the undertones from 32/32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16.
 If you have 16 overtones and 16 undertones on each, you end up with 256 pitches in the tonality diamond. Many are duplicates. Eliminating duplicates you end up with 213 pitches.
 
-Here is a picture of the diamond, with ratios, a note name in Sagittal notation, and the step in a 217 tone version to the octave scale. I used the 2113 in the diamond and added two more at the top and bottom to fill out the spectrum. In these notebooks I started out using that 217 tone scale, then switched to the 256 tone version for mathematical simplification. The 256 tone verion includes many duplicates, but csound doesn't care.
+Here is a picture of the diamond to the 31 limit, with ratios, a note name in Sagittal notation, and the step in a 256 tone version to the octave scale. This is what Erv Wilson referred to as the cassandra template. 
 
 ![Diamond_31-limit](31-limit_cassandra.jpg)
 
-This repo contains a jupyter notebook and some python modules that can be used to send notes to an instance of Csound, a tool that takes text files as input and generates an audio file. If you do it right, it is a marvelous way to create music. My use of Csound consists of taking samples of actual instruments and creating music from the samples. But Csound can generate almost every kind of electronic synthesis every conceived. My code requires samples of musical instruments. I've included a subset of samples in this repo that include finger piano, balloon drums, guitars, and various percussion instruments. 
+This repo contains a jupyter notebook and python module that can be used to send notes to an instance of Csound, a tool that takes text files as input and generates an audio file. If you do it right, it is a marvelous way to create music. My use of Csound consists of taking samples of actual instruments and creating music from the samples. But Csound can generate almost every kind of electronic synthesis every conceived. My code requires samples of musical instruments. I've included the required samples in this repo. They include finger piano, balloon drums, guitars, and woodwinds.
 
 ## Installation Requirements 
 
