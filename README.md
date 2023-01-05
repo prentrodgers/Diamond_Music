@@ -77,3 +77,5 @@ You will need to edit "ball3.csd" to replace <code>/home/prent/Dropbox/csound/Mc
 
 ## Notes concerning where csound writes it's output 
 Csound creates some very large wave files. I recommend that you put them in <code> ~/Music/sflib </code>. That's where the two bash scripts in the repo expect them to be, and where the csound files ball3.csd and ball3c.csd put them.
+
+# Examples are available on http://ripnread.com, with the most recent one here: http://ripnread.com/listen/ball3-t12.mp3
