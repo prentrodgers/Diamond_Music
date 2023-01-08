@@ -1,0 +1,211 @@
+ Here's a breakdown of the structure and uses of the various dictionaries I'm using to help organinze the notes, instruments, timing, and other elements.
+      Definitions of terms:
+            mode is 'oton', 'uton' - otonalities are built from overtones. 1,2,3,4,5, through 31 over a multiple of 2. 5:4 is a major third. 3:2 is a perfect fifth. 'uton' is a Utonlality, built from undertones, made from a multiple of 2 over 1,2,3,4,5, up to 31. 4:3 is a perfect fourth. 8:7 is a subminor third.
+            root is a string: '1/1', '16/19', etc that represents the start of the overtone or undertone series. 
+            ratio_float is a floating point value 1.0, 1.25, etc.
+            rank is 'A', 'B', 'C', 'D', 'E', and more. It's a scale based on the oton or uton mode consisting of 8 notes. 
+            chord is always a tetrad, a four note chord made from a subset of the 8 note scales built from a rank.
+                  in mode 'oton', Rank "A" contains the root of the chord, a major 3rd, a perfect 5th, and a flatted 7th: 4:5:6:7/8
+                  in mode 'uton', Rank "A" contains the root of the chord, a minor 3rd. a perfect 5th, and a sharp 6th: 8/4:5:6:7
+            chord_inversion is 1,2,3,4 representing the 1st through 4th inversion.
+            gliss_type is 'trills_2_step', 'trills_8_step', 'slide'. These are names for prebuilt trills and slides that take a note from one place to another, or to many other places.
+            instrument_short_name is a string describing an instrument like 'bfl', 'bss' in the voice_time dictionary in the notebook
+            all_ratio_strings = ratio_strings.reshape(256,) - An array of ratios in string form, such as '16/9' for B♭, indexed by the note numbers from 0 to 255. These don't represent how high a note is in the scale, just where it is located in the cassandra diagram.
+
+      Dictionaries in the diamond_music_utils.py
+            keys[mode][ratio] data is 16 note scale steps in 256 tones per octave
+            scales[rank][mode] data is 8 steps to index into 16 note scales based on the rank and mode
+            inversions[rank][mode][chord_inversion] data is the index into the 16 note scale step for 4 tetra chord inverted
+            best_rank_inversion_combos is a set of tetrad pairs that sound good when slid from one to the other. Indexed by rank and inversion in any root.
+
+      Functions in diamond_music_utils
+            def build_all_ratios(): returns the all_ratio_strings array for the 31-limit diamond with index from 0 to 255
+            def build_ratio_strings(): part of build_all_ratios
+            def build_chords(mode, ratio, rank, inversion): # returns a tetra chord (4 note chord)
+            def build_scales(mode, ratio, rank): # returns an 8 note scale
+            def build_scale_mask(scale); # pass an 8 note scale and this function returns a mask to boost the octave for each note so that it always goes up to a higher note. Pass it a scale that might start on G, A, B, C, D, E, F and it boosts the octaves in the notes from C, D, through F. 
+            def ratio_string_to_float(ratio): # returns a floating point value from a ratio in string form: "16/9"
+            def ratio_to_cents(ratio): # convert floating point ratio to cents
+            def cents_to_ratio(cents): # convert cents to a ratio string
+            def show_keys(): # returns the keys dictionary
+            def show_scales(): # returns the scales dictionary
+            def show_inversions(): # returns the inversions dictionary
+            def ratio_distance(start, end): # passed two ratios in string form returns a floating point ratio distance
+            def make_ftable_glissando(t_num, gliss_type, ratio): # A utility function that is passed a table number, gliss, ratio. returns the array that will build a csound ftable to enable a slide or trill. This is called by build_slides only. I should probably make it an underscore function. Later.
+            def show_scale_ratios(scale): # pass a scale or chord and and return the ratios in the scale as an array of strings
+            def start_logger(fname = LOGNAME): # start the logger 
+            The following are no longer used:
+                  def flushMessages(cs, delay=0): # after shutting down csound, send the queued messages to the log
+                  def printMessages(cs, delay=0): # calls flushMessages 
+                  def load_csd(csd_file, strip_f0 = False): # reads in the csd text and returns a string which can be passed to csound
+                  def load_csound(csd_content): # reads in the long string of csd, returns cs ctcsound instance and pt perform thread
+
+            def build_slides(start_table, chord_1, chord_2, gliss_type = 'slide'): # build a set of slides to go from one chord to another. It assembles an ftable for csound with a set of slides starting at start_table and going as many notes as there are in chord_1. returns the the table numbers of the built slides
+            def retrieve_gliss_tables(): # returns the  stored_gliss and current_gliss_table as two separate values
+            def init_stored_gliss(): # reset the glissando table to zero 
+            def update_gliss_table(gliss_table, current_gl): Updates the values in these tables and integer next available table number 
+            def show_voice_time_short_name - passed a voice number and a copy of the dictionary voice_time, returns the short name for the voice. For example, passed the number 6 and a voice_time dictionary, it will return the short name of the voice: "fp1"
+            def init_voice_start_times(voice_time): passed a dictionary of voice_time information, it will reset the start times for all voices to zero.
+            def fix_start_times(note_array, voice_time): This takes an array of notes, features, where features include durations for each note, and returns an array of notes, features where the features include the start times instead of the durations for each note.
+            def _build_voice_slide - a utility function to build a long set of slides in one csound ftable. Useful for having a slide pass through many notes.
+            def new_multiple_chord_slide - a function that takes a set of chords that pass through many keys, and returns the csound structures required to slide across all the notes.
+            def masked_notes_features(note_array, density_function): zero out the octaves for notes in an array of notes, features. This will make them silent. This is useful for taking a piano roll array of long chords, and poking holes in it to turn it into an arpeggio. It returns an array of notes, features.
+            def masked_voices_notes(octave_array, density_function): This function zeros out octaves in an array of voices, notes. It returns an octave array.
+            def send_to_csound_file: This takes an array of notes, features with start times, and formats output into the form csound requires.
+            def build_density_function(y, points): This takes an array of just a few points, and builds a spline that smoothly goes through those points. This is useful for gradually changing a value over many notes.
+            def format_seconds_to_minutes(sec, n_msec=3): Takes a number of seconds as input and returns a string in minutes and seconds for any value.
+            def root_chord_slide: This function is passed some parameters and returns note numbers and ftable numbers to slide from one tetra chord to another. All the notes must be in same root. I don't think I use this any more.
+            def masked_by_pattern. Take a limited size pattern and broadcast it across a larger array to create a repeating pattern on notes. Useful for building a repeating arpeggio on different notes.
+            def piano_roll_to_notes_features - This function takes an array of notes, features and combines sequentially identical notes together to form a note with a specific duration. Piano_roll arrays are one note per time_step. After this step, they are one note with a duration.
+            def _parse - utility function to take in a space-separated set of letters, and return the value of the symbol. For example, the word might include letters representing features, and numbers representing the values for those features, such as "n0d4v60o4e1". Subsequent words don't have to include all the features, they are inherited from prior notes. This function will return integers representing note = 0, duration = 4, velocity = 60, octave = 4, and envelope = 1.
+            def _arrays_from_text - a utility function that takes a string of words, and feeds them one at a time into _parse, and accumulates the values for each feature.
+            def fill_out_text(input): This takes a string of text words and passes it to _arrays_from_text, returning the text after including values for all the potential features.
+            def text_to_features(input, shuffle = False) - This is a function that is passed a string of words with all the features present for all the notes, allowing it to be shuffled and come out in a different order than the input words.
+            def choose_trill_type(repeat_each_note): This function returns a trill type based on how long a note will be playing. For example, if the duration is 4, it will return a trill that might have 8 steps, so that it matches the rhythm of the note.
+            def largest_evenly_divisible(array_size, max_number): This function returns the highest number evenly divisible into another note.
+            def mask_array(octave_array, mask): This takes an octave array and generates a mask that can be applied against that array to zero out notes, making them silent. The resulting mask can be broadcasted against the octave array.
+            each of the following four functions are designed to assemble a voices, notes array that will have the same duration:
+                  def build_bass_line( - Function to assemble a voices, notes array of a bass line
+                  def build_horn_from_text - function to process a set of text strings of words into an array of voices, notes.
+                  def build_arpeggio_part - function to assemble an array of voices, notes for an arpeggiated line
+                  def build_bass_flute_part - function to assemble an array of voices, notes for a line of slides
+            
+      key variables in the notebook:
+            all_ratios - 0 through 255 array of strings of ratios, such as "16/9"
+            ratio_strings - an array of (16,16) using the ratio strings of all_ratios
+            all_bridge_chord_arrays - derived from the grid search for the best path through the bridge. loaded by numpy at the start of the piece.
+                  all_bridge_chord_arrays.shape = (4, 19, 4, 9) where the dimensions are rank, 19 different choices in that rank, 4 voices and 9 notes
+            
+      Dictionaries in the notebook
+            voice_time - a dictionary to keep track of the current start times of all the notes being used in the piece. It allows reusing csound instruments as many times as needed, using a field called "time_tracker_number" to identify the note number in the piece, and passing that to csound as "csound_voice".
+            bridge_chords - a dictionary of the chords to be used in the bridge of the piece.
+                  bridge_chords[bridge_chord_num][start_or_end_chord]['mode']['ratio]['rank']['inversion']
+                  bridge_chords = {0: {0: {'mode': 'oton', 'ratio': '16/9', 'rank': 'A'}, # was 0
+                     1: {'mode': 'oton', 'ratio': '8/7', 'rank': 'A'}},
+                  It's a dictionary of mode, ratio, rank for the bridge chords. 
+                  It starts out all rank = 'A', but you can change that with set_bridge_chord_rank function, passing in the bridge_chord, and rank you prefer. But I always explicitly set the rank when creating scales and tetrads
+           
+            Remember that scales are 8 notes, keys or modes are 16 notes, tetrads are four notes. 
+                  Here is how you get a scale from a mode and a root:
+            
+            keys refers to a note number in the 256 note array from 0 to 255
+            keys = {'oton': {'1/1': array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15]),
+
+            scales refers to the note number in the keys dictionary with numbers from 0 to 15
+            scales =  'H': {'oton': array([12, 14,  0,  2,  5,  7,  9, 11]),
+                              'uton': array([ 5,  3,  1, 15, 12, 10,  8,  6])}}
+
+            inversions refer to the note number in the keys dictionary with numbers from 0 to 15                  
+            inversions = {'A': {'oton': {1: array([ 0,  4,  8, 12]),
+                  2: array([ 4,  8, 12,  0]),
+                  3: array([ 8, 12,  0,  4]),
+                  4: array([12,  0,  4,  8])},
+            'uton': {1: array([12,  8,  4,  0]),
+                  2: array([ 0, 12,  8,  4]),
+                  3: array([ 4,  0, 12,  8]),
+                  4: array([ 8,  4,  0, 12])}},        
+
+            tetrads are built in dmu.build_chords(mode, root, rank, inversion) which returns 4 notes 
+            scales are built in dmu.build_scales(mode, root, rank) which returns 8 notes 
+
+Valid gliss types support by diamond_music_utils.py
+      if gliss_type == 'slide':
+            fn_array = np.array([t_num, 0, 256, -7, 1, 64, 1, 64, ratio, 128, ratio])
+      elif gliss_type == 'cubic16_16_224':
+            fn_array = np.array([t_num, 0, 256, -6, 1, 16, np.average((1, ratio)), 16, ratio, 224, ratio])
+      elif gliss_type == 'cubic32_32_192':
+            fn_array = np.array([t_num, 0, 256, -6, 1, 32, np.average((1, ratio)), 32, ratio, 192, ratio])
+      elif gliss_type == 'cubic64_64_128':
+            fn_array = np.array([t_num, 0, 256, -6, 1, 64, np.average((1, ratio)), 64, ratio, 128, ratio])
+      elif gliss_type == 'cubic96_96_64':
+            fn_array = np.array([t_num, 0, 256, -6, 1, 96, np.average((1, ratio)), 96, ratio, 64, ratio])
+      elif gliss_type == 'cubic112_112_32':
+            fn_array = np.array([t_num, 0, 256, -6, 1, 112, np.average((1, ratio)), 112, ratio, 32, ratio])
+      elif gliss_type == 'trill_1_step':
+            fn_array = np.array([t_num, 0, 32, -7, 1, 16, 1, 0, ratio, 16, ratio])
+      elif gliss_type == 'trill_2_step':
+            fn_array = np.array([t_num, 0, 64, -7, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio])
+      elif gliss_type == 'trill_3_step':
+            fn_array = np.array([t_num, 0, 64, -7, 1, 13, 1, 0, ratio, 13, ratio, 0, 1, 13, 1, 0, ratio, 13, ratio, 0, 1, 12, 1])
+      elif gliss_type == 'trill_4_step':
+            fn_array = np.array([t_num, 0, 128, -7, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio])
+      elif gliss_type == 'trill_6_step':
+            fn_array = np.array([t_num, 0, 256, -7, 1, 21, 1, 0, ratio, 21, ratio, 0, 1, 22, 1, 0, ratio, 21, ratio, 0, 1, 21, 1, 0, ratio, 22, ratio, 0, 1, 21, 1, 0, ratio, 21, ratio, 0, 1, 22, 1, 0, ratio, 21, ratio, 0, 1, 21, 1, 0, ratio, 22, ratio]) 
+      elif gliss_type == 'trill_8_step':
+            fn_array = np.array([t_num, 0, 256, -7, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio, 0, 1, 16, 1, 0, ratio, 16, ratio])
+           
+Valid voice_time values:
+      voice_time = {
+    "fp1": {"full_name": "finger piano 1", "start": 0, "csound_voice": 1, "time_tracker_number": 0},
+    "fp2": {"full_name": "finger piano 2", "start": 0, "csound_voice": 1, "time_tracker_number": 1},
+    "fp3": {"full_name": "finger piano 3", "start": 0, "csound_voice": 1, "time_tracker_number": 2},
+    "fp4": {"full_name": "finger piano 4", "start": 0, "csound_voice": 1, "time_tracker_number": 3},
+    "fp5": {"full_name": "finger piano 5", "start": 0, "csound_voice": 1, "time_tracker_number": 4},
+    "fp6": {"full_name": "finger piano 6", "start": 0, "csound_voice": 1, "time_tracker_number": 5},
+    "bn1": {"full_name": "bass finger piano 1", "start": 0, "csound_voice": 2, "time_tracker_number": 6},
+    "bn2": {"full_name": "bass finger piano 2", "start": 0, "csound_voice": 2, "time_tracker_number": 7},
+    "bd1": {"full_name": "bass balloon drum 1", "start": 0, "csound_voice": 3, "time_tracker_number": 8},
+    "bd2": {"full_name": "bass balloon drum 2", "start": 0, "csound_voice": 3, "time_tracker_number": 9},
+    "bd3": {"full_name": "bass balloon drum 3", "start": 0, "csound_voice": 3, "time_tracker_number": 10},
+    "bd4": {"full_name": "bass balloon drum 4", "start": 0, "csound_voice": 3, "time_tracker_number": 11},
+    "bm1": {"full_name": "medium balloon drum 1", "start": 0, "csound_voice": 4, "time_tracker_number": 12},
+    "bm2": {"full_name": "medium balloon drum 2", "start": 0, "csound_voice": 4, "time_tracker_number": 13},
+    "bm3": {"full_name": "medium balloon drum 3", "start": 0, "csound_voice": 4, "time_tracker_number": 14},
+    "bm4": {"full_name": "medium balloon drum 4", "start": 0, "csound_voice": 4, "time_tracker_number": 15},
+    "bh1": {"full_name": "high balloon drum 1", "start": 0, "csound_voice": 5, "time_tracker_number": 16},
+    "bh2": {"full_name": "high balloon drum 2", "start": 0, "csound_voice": 5, "time_tracker_number": 17},
+    "bh3": {"full_name": "high balloon drum 3", "start": 0, "csound_voice": 5, "time_tracker_number": 18},
+    "bh4": {"full_name": "high balloon drum 4", "start": 0, "csound_voice": 5, "time_tracker_number": 19},
+    "bf1": {"full_name": "bass flute 1", "start": 0, "csound_voice": 6, "time_tracker_number": 20},
+    "bf2": {"full_name": "bass flute 2", "start": 0, "csound_voice": 6, "time_tracker_number": 21},
+    "bf3": {"full_name": "bass flute 3", "start": 0, "csound_voice": 6, "time_tracker_number": 22},
+    "bf4": {"full_name": "bass flute 4", "start": 0, "csound_voice": 6, "time_tracker_number": 23},
+    "ob1": {"full_name": "oboe", "start": 0, "csound_voice": 7, "time_tracker_number": 24},
+    "cl1": {"full_name": "clarinet", "start": 0, "csound_voice": 8, "time_tracker_number": 25},
+    "bs1": {"full_name": "bassoon", "start": 0, "csound_voice": 9, "time_tracker_number": 26},
+    "fr1": {"full_name": "french horn", "start": 0, "csound_voice": 10, "time_tracker_number": 27},
+    "btg": {"full_name": "baritone guitar", "start": 0, "csound_voice": 11, "time_tracker_number": 28},
+    "ob2": {"full_name": "oboe", "start": 0, "csound_voice": 7, "time_tracker_number": 29},
+    "cl2": {"full_name": "clarinet", "start": 0, "csound_voice": 8, "time_tracker_number": 30},
+    "bs2": {"full_name": "bassoon", "start": 0, "csound_voice": 9, "time_tracker_number": 31},
+    "fr2": {"full_name": "french horn", "start": 0, "csound_voice": 10, "time_tracker_number": 32},
+}
+
+bridge_chords = {0: {0: {"mode": "oton", "ratio": "16/9", "rank": "A"}, 
+                     1: {"mode": "oton", "ratio": "8/7", "rank": "A"}},
+                 1: {0: {"mode": "oton", "ratio": "8/7", "rank": "A"}, 
+                     1: {"mode": "uton", "ratio": "9/8", "rank": "A"}},
+                 2: {0: {"mode": "uton", "ratio": "9/8", "rank": "A"}, 
+                     1: {"mode": "oton", "ratio": "16/15", "rank": "A"}},
+                 3: {0: {"mode": "oton", "ratio": "16/15", "rank": "A"},
+                     1: {"mode": "uton", "ratio": "1/1", "rank": "A"}},
+                 4: {0: {"mode": "uton", "ratio": "1/1", "rank": "A"}, 
+                     1: {"mode": "oton", "ratio": "1/1", "rank": "A"}},
+                 5: {0: {"mode": "oton", "ratio": "1/1", "rank": "A"}, 
+                     1: {"mode": "uton", "ratio": "7/4", "rank": "A"}},
+                 6: {0: {"mode": "uton", "ratio": "7/4", "rank": "A"}, 
+                     1: {"mode": "oton", "ratio": "16/9", "rank": "A"}},
+                 7: {0: {"mode": "uton", "ratio": "15/8", "rank": "A"},
+                     1: {"mode": "oton", "ratio": "16/9", "rank": "A"}},
+                 8: {0: {"mode": "oton", "ratio": "16/9", "rank": "A"},
+                     1: {"mode": "uton", "ratio": "15/8", "rank": "A"}},
+                    }   
+
+best rank inversions from A to B:
+      print(*[(inx, str(combo)) for (inx, combo) in enumerate(best_rank_inversion_combos) if combo[0] != combo[1]], sep='\n')
+            (8, "['A' 'B' '1' '1']")
+            (9, "['A' 'B' '1' '4']")
+            (10, "['A' 'B' '2' '1']")
+            (11, "['A' 'B' '2' '2']")
+            (12, "['A' 'B' '3' '2']")
+            (13, "['A' 'B' '3' '3']")
+            (14, "['A' 'B' '4' '3']")
+            (15, "['A' 'B' '4' '4']")
+            (16, "['B' 'A' '1' '1']")
+            (17, "['B' 'A' '1' '2']")
+            (18, "['B' 'A' '2' '2']")
+            (19, "['B' 'A' '2' '3']")
+            (20, "['B' 'A' '3' '3']")
+            (21, "['B' 'A' '3' '4']")
+            (22, "['B' 'A' '4' '1']")
+            (23, "['B' 'A' '4' '4']")
