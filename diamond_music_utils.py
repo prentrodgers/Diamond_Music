@@ -243,21 +243,6 @@ def build_chords(mode, root, rank, inversion):
             chord = None
       return chord
 
-# this function transform a note sequence dictionary into an array.
-def array_from_dict(time_step_dict):
-    
-      time_step_array = np.empty((len(time_step_dict), len(time_step_dict["instrument"])), dtype = float) 
-      # make sure you have the same number of values in each dictionary entry
-      assert all([len(time_step_dict[time_step]) == len(time_step_dict["instrument"]) for time_step in time_step_dict.keys()]), "not all items in the note dictionary have the same quantity of notes"
-    
-      inx = 0
-      for column in time_step_dict:
-            time_step_array[inx] = time_step_dict[column]
-            inx += 1
-            
-
-      return (time_step_array.T)      
-
 # This function takes a table number, glissando type, and ratio and returns an array that can be passed to csound to bend a note
 def make_ftable_glissando(t_num, gliss_type, ratio):
 #                               +-- table number
@@ -576,6 +561,35 @@ def new_multiple_chord_slide(rank, chosen_array, each_slide_step, all_bridge_cho
     notes = array_of_chords.T[0,:] # just the first note for each instrument
     return notes, gliss
 
+def masked_notes_by_voice(notes_features, voices, density_function, voice_time):
+    voice_num = np.unique(np.array([voice_time[short_name]["csound_voice"] for short_name in voices])) # transform an array of voice short names into unique csound voice number
+    print(f'{voice_num = }, {voices = }, {density_function.shape = }, {notes_features.shape = }')
+    vel_col = 5
+    oct_col = 5 # it's not one!
+    voice_col = 6
+
+    is_voice = 0
+    not_voice = 0
+    zero_oct = 0
+
+    for inx in np.arange(notes_features.shape[0]):
+        if density_function[inx] > 0.99: 
+            density_function[inx] = 0.98 # can't allow a probability > 1
+        elif density_function[inx] < 0.001: # nor less than zero
+            density_function[inx] = 0.001            
+        #  current values of density_function are set between 0 and almost 1
+        #  choose between 0 and 1, return 1 number, with probability of being zero is 1 - current value, and the probability being one is the current value of the density function
+        if notes_features[inx][voice_col] in voice_num: # is this note in this instrument group?
+            is_voice += 1
+            if rng.choice([True, False], size = None, p = [1 - density_function[inx], density_function[inx]]):  # each note can have it's own probability of being zero
+                notes_features[inx][oct_col] = 0 # if the probability is right, zero out the octave.
+                zero_oct += 1
+        else:
+            not_voice += 1
+    print(f'{not_voice = }, {is_voice = }, {zero_oct = }')
+    return(notes_features)
+     
+
 def masked_notes_features(note_array, density_function):
     assert note_array.shape[0] == density_function.shape[0], logging.info(f'unequal dimensions between the note_array and the density_function. {note_array.shape = }, {density_function.shape = }')
     # fill an array with zeros and ones, with more of one than the other based on density
@@ -583,12 +597,13 @@ def masked_notes_features(note_array, density_function):
     # density function will be exactly as long as the note array. (same shape[0])
     # I want a mix_mask that has either zero or one, but the choice will favor ones when the density function for that note is high (1.0)
     # and if the density function for the note is low (0.2) then the likelihood is low.
+    hold_column = 2
     mix_mask = np.zeros(note_array.shape[0])
     for inx in np.arange(note_array.shape[0]):
         if density_function[inx] > 0.99: density_function[inx] = 0.98 # can't allow a probability > 1
         mix_mask[inx] = rng.choice(np.arange(2), size = 1, p = [1 - density_function[inx], density_function[inx]]) # each note can have it's own probability of being zero
     # once you've built the mask, then apply it to the hold values
-    note_array[:,2] = note_array[:,2] * mix_mask # multiply hold values by zeros ones to erase a percent of the notes
+    note_array[:,hold_column] = note_array[:,hold_column] * mix_mask # multiply hold values by zeros ones to erase a percent of the notes
     # logging.info(f'{note_array.shape = }\n{mix_mask.shape = }, {mix_mask[:5] = }')
     return note_array
 
@@ -602,7 +617,8 @@ def masked_voices_notes(octave_array, density_function):
     octave_array = octave_array * mix_mask # multiply octave values by zeros to erase a percent of the notes
     return octave_array
 
-def send_to_csound_file(notes_features, voice_time, path_to_input, path_to_output = "new_output.csd",  limit = 0, tempos = '', print_only = 10, tempo = 60):
+def send_to_csound_file(notes_features, voice_time, path_to_input, path_to_output = "new_output.csd", \
+            limit = 0, tempos = '', print_only = 10, tempo = 60):
       if limit == 0: limit = np.max([voice_time[inst]["start"] for inst in voice_time])
       logging.info(f'limit to writing to csound file is set at {limit = }')
       logging.info(f'last note ends: {round(60*limit/tempo,1) = } seconds')
@@ -631,7 +647,7 @@ def send_to_csound_file(notes_features, voice_time, path_to_input, path_to_outpu
       max_z = 0
       min_z = 0
       start_time_col = 1
-      for row in notes_features:
+      for row in notes_features: # add a perturbation time to each note.
             z = rng.choice(z_range) 
             max_z = np.max((z, max_z))
             min_z = np.min((z, min_z))
@@ -647,16 +663,11 @@ def send_to_csound_file(notes_features, voice_time, path_to_input, path_to_outpu
       print(f'{print_only = }')
       print(f' 1\t2\t3\t4\t5\t6\t7\t8\t9\t0\t11\t12\t13\t14')
       print(f'Sta\tHold\tVel\tTon\tOct\tVoi\tSte\tEn1\tGls\tUps\tRen\t2gl\t3gl\tVol')
-      #  1     2      3     4     5     6     7    8      9   10    11    12    13    14
-      # Sta   Hold   Vel   Ton   Oct   Voi   Ste  En1    Gls  Ups   Ren   2gl   3gl   Vol
-      # 0.01	0.55	50.0	36.0	4.0	8.0	12.0	2.0	799.0	0.0	2.0	799.0	799.0	60.0
-      # print(f'1    3     4     5')
-      # print(f'Sta  Vel   Ton   Oct')
+      #  0        1      2    3     4     5     6     7     8     9     10    11    12    13    14
+      # ;Inst	Sta	Hold	Vel	Ton	Oct	Voi	Ste	En1	Gls	Ups	Ren	2gl	3gl	Vol
       for notes in notes_features[:print_only]:
             print(f'{round(notes[1],2)}\t{round(notes[2],2)}\t{round(notes[3],2)}\t{notes[4]}\t{notes[5]}\t{notes[6]}\t{notes[7]}\t{notes[8]}\t{notes[9]}\t{notes[10]}\t{notes[11]}\t{notes[12]}\t{notes[13]}\t{round(notes[14],3)}')
       f.write(f';Inst\tSta\tHold\tVel\tTon\tOct\tVoi\tSte\tEn1\tGls\tUps\tRen\t2gl\t3gl\tVol\n')
-      # ;Inst Sta   Hold   Vel   Ton   Oct   Voi   Ste  En1    Gls  Ups   Ren   2gl   3gl   Vol
-      # i 1.0	11.987	0.275	45.0	42.0	2.0	9.0	7.0	2.0	799.0	0.0	2.0	799.0	799.0	60.0	
       rows_written = 0
       for notes in notes_features:
             if notes[1] < limit:
@@ -682,15 +693,10 @@ def build_density_function(y, points):
     X_ = np.linspace(x.min(), x.max(), points)
     return spline(X_)
 
-# # I don't see where this is called ever. 
-# def reset_voice_time(new_start):
-#     for voice in voice_time:
-#         voice_time[voice]["start"] = new_start
-#     return new_start
-
 def format_seconds_to_minutes(sec, n_msec=3):
       # Convert seconds to D days, HH:MM:SS.FFF
       # if hasattr(sec,'__len__'): return [sec2time(s) for s in sec]
+      # print(f'in format_seconds_to_minutes. {sec = }, {n_msec = }')
       m, s = divmod(sec, 60)
       h, m = divmod(m, 60)
       d, h = divmod(h, 24)
@@ -780,6 +786,7 @@ def piano_roll_to_notes_features(note_array, volume_array, instruments, time_per
                         max_hold = np.max((max_hold, hold))
                         duration = time_per_note 
                         hold = time_per_note
+                        #       0      1    2    3    4     5     6
                   prev_note = (note, octv, glx, upx, envx, velx, volx)
                   input_note_inx += 1 
                   
@@ -788,8 +795,9 @@ def piano_roll_to_notes_features(note_array, volume_array, instruments, time_per
             z = rng.choice(z_range)             
             max_z = np.max((z, max_z))
             min_z = np.min((z, min_z))
+            #                                      1, dur,           hol, vel,            note,             octv,  voice,      stereo
             notes_features[output_inx] = np.array((1, duration + z, hold, prev_note[5], prev_note[0], prev_note[1], voice_num, stereo, \
-                                    # env        gls1         upsample     r env          2nd   3rd glis volume
+                                    # env        gls1         upsample     r env     2nd   3rdgl volume
                               prev_note[4], prev_note[2], prev_note[3], prev_note[4], 799, 799, prev_note[6]))
             output_inx += 1
             input_voice_inx += 1
@@ -863,7 +871,7 @@ def _parse(word, prev_note, prev_oct, prev_dur, prev_env, prev_vel, prev_ups, pr
     
     return(note_value, oct_value, env_value, dur_value, vel_value, ups_value, gls_value)
     
-def _arrays_from_text(input, prev_note = 0, prev_oct = 3, prev_dur = 4, prev_env = 1, prev_vel = 75, prev_ups = 0, prev_gls = 0, shuffle = False):
+def _arrays_from_text(input, prev_note = 0, prev_oct = 3, prev_dur = 4, prev_env = 1, prev_vel = 75, prev_ups = 0, prev_gls = 799, shuffle = False):
       input_list = np.array(np.char.split(input,sep=" ").tolist())
       notes = np.empty(0, dtype = int)
       octv = np.empty(0, dtype = int)
