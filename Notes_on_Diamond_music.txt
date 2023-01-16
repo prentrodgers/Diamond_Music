@@ -1,18 +1,4 @@
-______________________________________________
-If you need to ftp something to the godaddy site:
-
-Paste this on the command line:
-
-cd ~/Dropbox/Uploads
-
-ftp -n 50.63.92.48 << EOF
-quote USER prentrodgers
-quote PASS 33Erigeron#
-binary
-cd listen 
-put ball3-t12.mp3
-quit
-EOF
+This is a diary of activity on creating Diamond Music.
 ------------------------------------------------------rt
 8/5/22 To do today
 
@@ -1063,10 +1049,7 @@ Almost legible in a half screen.
       Had to set duration to zero. That doesn't seem right. I added the code that does the automatic 0 of the first durations, so that each octave overlaps.
 
 --------------------------
-✅    I took a detour and finally figured out how to get code-server to work. 
-      I now have vscode on the web on two machines, my T480 and the HP800. But I can't reach it from another machine, only on the one running code-server. Jupyter allows access. Let's see. need to set bind-addr: 0.0.0.0:8080 in /home/prent/.config/code-server/config.yaml
-      That means anyone with a password can edit all my files if they get onto my network. The solutions are all very complex. See: /
-            home/prent/Dropbox/Tutorials/vscode/Setting Up VScode server.txt
+
 -------------------------------
 9/24/22 To do today:
 
