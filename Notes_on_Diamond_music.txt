@@ -1,5 +1,3 @@
-This is a diary of activity on creating Diamond Music.
-------------------------------------------------------rt
 8/5/22 To do today
 
 ✅    Make some music with the chords you made for Balloon Drum Music. Build a woodwind orchestra.
@@ -1049,7 +1047,10 @@ Almost legible in a half screen.
       Had to set duration to zero. That doesn't seem right. I added the code that does the automatic 0 of the first durations, so that each octave overlaps.
 
 --------------------------
-
+✅    I took a detour and finally figured out how to get code-server to work. 
+      I now have vscode on the web on two machines, my T480 and the HP800. But I can't reach it from another machine, only on the one running code-server. Jupyter allows access. Let's see. need to set bind-addr: 0.0.0.0:8080 in /home/prent/.config/code-server/config.yaml
+      That means anyone with a password can edit all my files if they get onto my network. The solutions are all very complex. See: /
+            home/prent/Dropbox/Tutorials/vscode/Setting Up VScode server.txt
 -------------------------------
 9/24/22 To do today:
 
@@ -4202,7 +4203,7 @@ Time out to catch up on YourLearning.com assignments. More to do, but at least I
 
 1.    Consider https://www.riffusion.com/about generates music from spectrographs. Code: https://github.com/riffusion/riffusion Or not.
 
-2.    Double check the masking. 
+✅    Double check the masking. 
       Make sure the masking in each of vamp_creator and bridge_creator are not influenced by the predominance of one or two instruments in the input that is masked:
             density_input = np.array([.9, .8, .6, .8, .9])
             logging.info(f'{density_input = }')
@@ -4217,7 +4218,7 @@ Time out to catch up on YourLearning.com assignments. More to do, but at least I
       That's all well and good from the way it sounds: instruments go silent sometimes, then they are all over the place. Just like life. 
       If I really want to have total control of the density over time, I'll need to add something to send_to_csound_file to receive a density function and zero out some notes if we are seeking a less dense result. 
 
-3.    Get the g function working. 
+✅    Get the g function working. 
       I'm thinking I don't need to do anything else in the this function, other than just storing the gliss number, as in the number of notes that will need to be part of a slide.
             dmu.fill_out_text(input) # <-- ensure that each "word" has all the required features. noevugd.
       Just return those values to the caller and let them sort out what to do with them.    
@@ -4226,7 +4227,7 @@ Time out to catch up on YourLearning.com assignments. More to do, but at least I
 --------------------------
 1/12/23 To do today:
 
-1.    Masking is getting by on a wing and a prayer, and some serious denial. 
+✅    Masking is getting by on a wing and a prayer, and some serious denial. 
       Of course it sounds good, because I've been tweeking it like some kind of cargo cult until it sounds good. Should I stop there?
       I should really improve this function so it does a more sensible job and is faithful to the idea of timing.
             density_input = np.array([.9, .8, .6, .8, .9])
@@ -4264,17 +4265,6 @@ Time out to catch up on YourLearning.com assignments. More to do, but at least I
       That will give me the duration of each section. I will need to preserve that until I need it to build the density_input string.
       So I now have that: 
            
-            section_times.shape = (120,)
-            total_time_steps(notes_features) = 24.0
-            total_time_steps(notes_features) = 96.0
-            total_time_steps(notes_features) = 168.0
-            total_time_steps(notes_features) = 240.0
-            total_time_steps(notes_features) = 432.0
-            total_time_steps(notes_features) = 576.0
-            total_time_steps(notes_features) = 720.0
-            total_time_steps(notes_features) = 864.0
-            total_time_steps(notes_features) = 912.0
-            24.0 72.0 24.0 24.0 24.0 72.0 48.0 48.0 48.0 48.0 144.0 48.0 48.0 48.0 144.0 24.0 24.0
             section_num = 17
             sums to 912 
             912 / 24 = 38. So I should create a density_input with 38 points for each of four instrument clusters.
@@ -4283,12 +4273,12 @@ Time out to catch up on YourLearning.com assignments. More to do, but at least I
             
       A better idea is just to track transition points. The current method just creates too many to deal with, and is error prone. 
 
-2.    Consider taking the whole notes_features array at some point and flipping it. Too late. It screws up the timing when you take something that already has durations in it and run it backwards. Or it appears to.
+✅    Consider taking the whole notes_features array at some point and flipping it. Too late. It screws up the timing when you take something that already has durations in it and run it backwards. Or it appears to.
 
 -------------------------
 1/14/23 To do today 
 
-1.    Finish the effort to sensibly control density over time. 
+✅    Finish the effort to sensibly control density over time. 
       a.    The best density reduction takes out a whole instrument group for a while. Especially for the horns and bass flute parts. Just getting rid of one or two of the eight instruments just makes it sound thin and weak. It's either there or it isn't. You can get away with occasional thin sounds, but not too many. Make them rare. This implies that the thin sections should be more common than a whole section, but rather chop up a section with dense and thin parts. 
       b.    What transition points do you have now:
              verse       bridge      verse       bridge      verse       bridge      verse       bridge      verse
@@ -4305,7 +4295,8 @@ Time out to catch up on YourLearning.com assignments. More to do, but at least I
 
 ----------------------------
 1/15/23 Same as yesterday.
-      Now that I've populated the density input by hand, I'm finding some unpredicted results:
+     
+✅    Now that I've populated the density input by hand, I'm finding some unpredicted results:
       I had to change the first few values so that it would start the first bridge with a decent horn and flute probabilities.
       density_input = np.array([[.9,  .9, .9, .9, ...
                           [.01, .7, .9, .9, ...
@@ -4318,12 +4309,12 @@ Time out to catch up on YourLearning.com assignments. More to do, but at least I
 ---------------------
 1/16/23 To do today:
 
-1.    Choose the right g feature and start it's implementation. The Anita Baker slide. Rapture 1986.
+✅    Choose the right g feature and start it's implementation. The Anita Baker slide. Rapture 1986.
 
       Get back to work implementing the g text input capability for short glissandi in existing text input processing. 
-I'm thinking I should leave this one as is. There is plenty of slides here. I put all those slides in when I had so many horn riffs sounding alike. I also wanted to add slides to the bass part. But I think this is pretty good as it.
+      I'm thinking I should leave this one as is. There is plenty of slides here. I put all those slides in when I had so many horn riffs sounding alike. I also wanted to add slides to the bass part. But I think this is pretty good as it.
 
-      Implement glissandi in text_to_features.
+✅    Implement glissandi in text_to_features.
       What if I add another letter to the text_to_features function "g" which says how many of the next notes should be arrived at by glissando? That would be awesome. I'm always in search of that Anita Baker glissando. So many choice and controls.
 
       How would it work? 
@@ -4387,13 +4378,704 @@ I'm thinking I should leave this one as is. There is plenty of slides here. I pu
                        gliss_array =  np.array(8,  8,  8,  8,  8,  8,  8,  8,  0,  0,  0,  0,  0,  0,  0,  0,  12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 0,  0,  0,  0)
             
             gliss_array = [801, 801, 801, 801, 801, 801, 801, 801] # I'm assuming all notes will get the same glis, as they get the same note, octave, env, vel, ups
-      Some of the factors you will need to deal with:                                                                      ___
+      Some of the factors you will need to deal with. I never really considered how to handle overlapping glides. Make sure you test this out.
       a.    How long to stay at each note in the slide if it goes over more than two notes. Assume equal time for all? ___/   \____
       b.    How to deal with repeated slides, one after the other with no g0 pause.                                     3 1 3 1 4  = 12 steps
             They will look identical to a slide that continues
-      c.    When to build the slides. 
+      ✅    When to build the slides. 
             1.    Should I build them in the same function as I discover the g values? No
             2.    Or wait until after the return from dmu.text_to_features() in bridge_creator or vamp_creator? Yes
-      d.    How to use or modify:
+      ✅    How to use or modify:
                   def _build_voice_slide(t_num, one_voice_array, each_slide_step = 120): 
             to meet these requirements.
+            So I've been able to separate out several different elements:
+                  keep this section discrete: notes_in_scale[end:start] = array([32, 32, 32, 32])
+                  build a glide over this section: original_scale[start:end] = array([34, 34, 34, 34, 36, 36, 36, 36])
+                  keep this section discrete: notes_in_scale[end:start] = array([38, 38, 38, 38])
+                  build a glide over this section: original_scale[start:end] = array([40, 40, 40, 40, 42, 42, 42, 42, 44, 44, 44, 44])
+                  keep this section discrete: notes_in_scale[end:] = array([46, 46, 46, 46])
+            Now I need to pass them through different functions. 
+            I have the slide part almost ready, but since I'm passing 8 notes, the slide takes place only during the change in note ratio. I'd like to compress the array before sending it though the function. Use np.unique(). But what if the array looks like this: np.array([32, 32, 32, 32, 34, 34, 34, 34, 32, 32, 32]), it gets compressed down to (32, 34])
+            I wrote a util called thin that does what I want, compressed duplicate notes away. 
+            
+      ✅    I'll need to preserve the memory of the notes that the slide will go over, after I've changed the notes to be where I want them. 
+
+      ✅    I've isolated the notes that have to be slid over, then I need to run them through the _build_voice_slide function. And concatenate them with the notes that don't need sliding.
+
+      ✅    It would really simplify matters if I changed the gliss for no slide to 0, but that one is already used for a special purpose, namely how long to keep csound active waiting for work. "An f 0 statement (zero p1, positive p2) may be used to create an action time with no associated action."
+      But it can also be used as a normal f table.
+            f0 0 256 -7 1 256 1 ; no slide
+
+      ✅    Where I left off: trying to concatenate the newly created f table to the stored f tables.
+            stored_gliss_table = np.concatenate((stored_gliss_table, gliss_f_table), axis = 1) # this is a global variable.
+            gliss_f_table.shape = (70,), stored_gliss_table.shape = (0, 70)
+            gliss_f_table = np.reshape(gliss_f_table, (1, 70)) # <-- fixed it
+
+---------------------
+1/17/23 To do today
+
+✅    Finish filling out the glide parts and the non-glide parts of the text processing steps.
+      a.    populate the notes, octv, env, vel, ups, gls with the proper number of slots for each note.
+      b.    notes - notes_in_scale has the right values, as does env, octv, vel
+      c.    ups - needs to be able to increase or decrease the ups away from 0 if the slide goes up or down.
+            0     1      2    3     4   5    6     7    8     9   10   11    12  13    14
+            800.0 0.0 2048.0 -7.0 1.0 121.0 1.0 120.0 1.11 121.0 1.11 120.0 1.11 0.0
+            element 4 & 6 is the start destination
+            element 8 & 10 is the next destination 
+            element 12 & 14 is the third destination
+            element 16 & 18 is the 4th, theoretically
+      
+-----------------------------
+1/19/23 To do today:
+
+✅    Figure out where the parsing of the gliss values should go.
+      in vamp_creator, in horn, we process several lines at once
+            answer = np.array([dmu.text_to_features(dmu.fill_out_text(input), shuffle = rng.choice([True, False], p = [0.1, 0.9])) for input in input[input_chosen]]) 
+      Then we parse the answer variable into arrays of notes, octv, env, vel, ups, gls, tile them by voices 
+      Then send them through dmu.build_horn_from_text.
+      in bridge_creator, in flu, we process only a single line
+            notes, octv, env, vel, ups, gls = dmu.text_to_features(dmu.fill_out_text(inputs_array), shuffle = shuffle)
+      tile by voices 
+      send them through dmu.build_horn_from_text
+      So if I put the processing of the gliss in build_horn_from_text, that means it only has to be in once place.
+
+      There is a problem with dmu.build_horn_from_text. It is expecting all the voices in one batch, and I expect one voice at a time. 
+      I will have to split them up into individual streams, then reassemble them at the end.
+
+      So the question now is, why is the input to dmu.build_horn_from_text gliss shape (4,48) when all the others are (8,48)?
+      Start here on Friday.z
+
+✅    Remember to do something about the ups in the flu section where it assigns each instrument a different ups value. 
+      I like that idea, but it should not just reassign them. It needs to shift the values that have already been assigned.
+
+-----------------------------
+1/21/23 To do today:
+
+1.    See if you can get the whole environment working on the T15 laptop. 
+      It didn't work, asked for an ipykernel install from pip.
+            cd ~
+            python -m venv virtual_python
+            source virtual_python/bin/activate
+            pip install ipykernel
+      Still could not get code-server to execute the jupyter. Kept saying it was missing ipykernel.I got it working on several occasions, but never consistently.
+
+✅    Fix the problem with the dimensions of the gliss array I found on the ThinkCentre.
+      I think it's because I preloaded the gliss array before I sent it to further processing.
+      vamp_creator called build_horn_from_text.
+            2023-01-21 10:07:05,109 - root - INFO - vamp_creator horn before tile. answer.shape = (4, 6, 16)
+            2023-01-21 10:07:05,113 - root - INFO - vamp_creator horn after tile.  answer.shape = (4, 6, 48)
+      I think the problem is that I have two names for the gliss array and I get them mixed up. 
+      gls = array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 0, 0, 0])
+      At the very start of build_horn_from_text it has gliss_array as (4,48), while all the others are at (8,48)
+      gliss_array.shape = (4, 48) # <-- right after it shows it as (48,0) here it is as (4,48)
+      The reason is that I had neglected to tile the gls array, as I had all the other arrays.
+      if voices > 4:
+                  notes = np.tile(notes, (voices // 4, 1))
+                  octv = np.tile(octv, (voices // 4, 1))
+                  env = np.tile(env, (voices // 4, 1))
+                  vel = np.tile(vel, (voices // 4, 1))
+                  ups = np.tile(ups, (voices // 4, 1))
+                  gls = np.tile(gls, (voices // 4, 1))
+                  shapes = [arr.shape for arr in [notes, octv, env, vel, ups]]
+✅    Create a jupyter session in code-server serve-local
+      https://code.visualstudio.com/docs/python/environments
+      I was able to do it once using code (the app), but not using code-server serve-local. But even the code version wasn't reliable.
+      I got the code-server to work as well. I finally stumbled into a solution. For a while, but reboot and it vanished.
+
+      First make sure the environment has been activated. I used this advice: https://stackoverflow.com/questions/64997553/python-requires-ipykernel-to-be-installed
+      Open a new terminal window (ctl-shift-~)
+      issue the environment commands:
+            cd ~ 
+            python -m venv virtual_python 
+            source virtual_python/bin/activate
+      Help from here: https://code.visualstudio.com/docs/python/environments
+      search for "Work with Python interpreters"
+            clt-shift-P
+            Python: Select interpreter 
+            select the one that says venv. 
+      Now you have jupyter inside code-server. 
+      But it can't find any of the python libraries, like numpy, that I installed in the environment, and it clearly won't find diamond_music_utils.py
+      It's finally working, once I selected the right kernel:
+            python 3 (ipykernel)
+
+4.    I'd like to see if I could get the cuda library working on this machine for deep learning. Forget it Jack, it's a MX450 wimpy card.
+
+--------------------------
+1-22-23 To do today
+
+✅    See if you can get a few slides working on the bass flute and the woodwinds.
+      Trouble: thin(arr):
+            993     target = np.zeros(arr.shape, dtype = int)
+            --> 994     prev = arr[0]
+            995     inx = 0
+            996     for element in arr:
+
+            IndexError: index 0 is out of bounds for axis 0 with size 0
+      in build_horn_from_text. original_scale.shape = (4, 60), start = 12, end = 20
+      There's your trouble: 
+            in build_horn_from_text. original_scale.shape = (4, 64), start = 12, end = 28
+            in thin. type(arr) = <class 'numpy.ndarray'>
+            arr.shape = (0, 64)
+      I'm expecting array of shape (some_number,)
+      What goes into build_horn_from_text is four voices. It should be one voice at a time. I thought I fixed that.
+      The problem was that I was assigning notes_in_scale[note_array] before spliting it into streams of one note per stream. I moved it into the loop:
+            for notes, octv, env, vel, ups, gls in zip(note_array, octave_array, envelope_array, vel_array, ups_array, gliss_array):
+                  notes_in_scale = scale[notes] # these will change for those notes that are gliding by f table
+                  original_scale = scale[notes] # these will be saved to send to _build_voice_slide
+                  logging.info(f'processing a stream: {[var.shape for var in [notes, original_scale, octv, env, vel, ups, gls]]}')
+      Finally fixed that one. Then another cropped up:
+      And another. Picking them off one by one. The reason is that the code path for the gliss wasn't tested until now.
+            notes_in_scale is wrong:     [(64,),         (4, 64),        (4, 64), (4, 64), (4, 64), (4, 64)]
+      The problem is that notes_in_scale and original_scale were being handled wrong.
+-------------------------------------------
+1/25/23 To do today:
+
+✅    Several bugs that I thought I cleared yesterday are back again. 
+      I must have neglected to synch after returning home last night. Bummer. I remembered most of the changes and was able to apply them quickly. 
+
+-----------------------------------------
+1/29/23 To do today
+
+✅    Figure out why the slide bass flute parts have clicks. They end with DC signals. 
+      a.    Why the short envelopes?
+
+✅    Get rid of the silences until you are happy with the slides. Set likelihood = 0.99
+      def build_horn_from_text(repeat_section, note_array, octave_array, envelope_array, vel_array,\
+            ups_array, gliss_array, voices, mode = "oton", root = "16/9", rank = "A",\
+            roll_low = -3, roll_high = 4, likelihood = .65, octave_shift = 0):
+
+✅    Don't forget to ensure the ups values are right.
+
+✅    Take a look at the eps output.
+            gs -sDEVICE=pdfwrite -o ball3.pdf ball3.eps
+      Notice that it is a GEN06: segments of cubic polynomials
+      Here is the multinote horn slide after modifying the size of the steps and stays.
+            I need 9 stays and 8 moves
+            f 800.0 0.0 2048.0 -7.0 
+            1.0 114.0 1.0 113.0 
+            0.9642857142857143 114.0 0.9642857142857143 113.0 
+            1.0125000000000002 114.0 1.0125000000000002 113.0 
+            1.05 114.0 1.05 113.0 
+            1.125 114.0 1.125 113.0 
+            1.125 114.0 1.125 113.0 
+            1.125 114.0 1.125 113.0 
+            1.0546875 114.0 1.0546875 113.0 
+            1.0 114.0 1.0 114.0 1.0  
+      average_slide_step = 227.0, each_stay_step = 114.0, each_slide_step = 113
+      2023-01-30 14:20:05,908 - root - INFO - total_f_steps = 1930.0
+      How large is it? 1930. Too small.
+      I'll have to take a look at _build_voice_slide()
+
+✅    Fix the bugs in _build_voice_slide. 
+      I think I got rid of all of them with the exception of the long slide, where that ends by going to zero, but after it has completely faded away. 
+
+-------------------------
+1/30/23 To do today:
+
+✅    Set up an environment where the coding takes place on the T15 and the jupyter notebook is on the ThinkCentre.
+      
+      On the ThinkCentre:
+            toolbox enter tunnel
+            code-server serve
+      It generates a URL to access from the T15:            
+            https://insiders.vscode.dev/+ms-vscode.remote-server/think-center/var/home/prent
+      code-server then allows you to open a folder you'd like to work in, and this switches the URL to:
+            https://insiders.vscode.dev/tunnel/think-center/var/home/prent/Dropbox/Tutorials/Diamond_Music
+      This is your window into the files on the ThinkCentre, not the T15. 
+      
+      Set up a separate tls tunnel to the ThinkCentre that mirrors 8888 port on the TC back to the T15.
+            ssh -L 8888:localhost:8888 prent@192.168.68.73
+      You may find that the port is already in use. If so:
+                  lsof -i :8888 
+                  kill -9 xxxx
+            Kill the using pid xxxx thus listed or use this one-liner (didn't work the one time I tried):
+                  lsof -wni tcp:8888 | xargs -I{} kill -9 {}
+      The tunnel opens up a terminal window back on the ThinkCentre. Enter these commands on that window:
+            cd ~
+            toolbox enter tunnel
+            python3.11 -m venv virtual_python
+            source virtual_python/bin/activate
+            jupyter lab --notebook-dir Dropbox/Tutorials/Diamond_Music
+      Access this link on the T15 for the jupyter lab server on the TC:
+            http://192.168.68.73:8888/lab        
+      
+      Note that you won't be able to play the audio file on the ThinkCentre in his Music/sflib folder using an audio player on the T15. You will be limited to audacity on the ThinkCentre. Deal with this by shipping the eps and wav files back to the T15 in the jupyter notebook, then running them on the T15. Easy-peasy.
+
+✅    Finish the modification to the horns and the flute to include slides.
+
+✅    Find out why the horn and bass flute sometimes get way too low octaves.
+      I think it's because of the octave_shift variable. And why is the each bass flute playing different options. They should be in unison. On the other hand, it much more likely that it's caused by setting the octave to zero in the text, and subsequently having the octave shift send it up one octave to o1 or o2, which is way too low. That was it. Fixed it.
+
+--------------------
+1/31/23 To do today:
+
+✅    Check this out. Summary of progress using AI for audio: https://github.com/archinetai/audio-ai-timeline
+      They all sound like real music through a tunnel. In the distance. Like a lousy distortion pedal. Reminds me of the joke about the dog that can talk. He describes all the marvelous things he had done, in great detail. When the visitor asks why the owner wants to get rid of him, he answers that he's a terrible liar. 
+
+✅    Fix the problems not solved in previous efforts. 
+      Right now I'm stuck on dimensionalilty problems in build_horn_from_text.
+            if note_array[inx, oct_col, inx2] > 0:
+      I think I have an incorrect impression of note_array at this point in the code:
+            note_array.shape = (6, 4, 64)
+            beforerolls. rolls = array([0, 0, 0]), note_array[0,0,:8] = array([32, 32, 32, 32, 32, 32, 32, 32]), repeat_section = 3
+            after rolls. rolls = array([0, 0, 0]), note_array[0,0,0,:8] = array([32, 32, 32, 32, 32, 32, 32, 32])
+            repeat_section = 3
+            note_array.shape = (3, 6, 4, 64)
+            about to add new_octave = 0 to the current octave
+            3 repetitions, 6 features, 4 voices, 64 note across the 4 voices.
+      I'm cleaning up some of the cruft, and fixing things, but some problems still remai:
+            1.    Some non-unison sections. 
+                  These could be a result of taking each voice separately through some function and getting different results. These appear to have gone away.
+            2.    Some very deep bass sections. I figured that one out, after about 2 1/2 day's work.
+
+-----------------------
+2/1/23 To do today:
+
+✅    I'm starting to think that there are too many ways to make changes to the build_horn_from_text function. 
+      a.    For the bass flute, here are the setting that:
+            1.    Shuffle the order - only in 1% of cases
+                  shuffle = rng.choice([True, False], p = [0.01, 0.99]) # shuffle will come later after I get the g values working
+                  notes, octv, env, vel, ups, gls = dmu.text_to_features(dmu.fill_out_text(inputs_array), shuffle = shuffle)
+            2.    np.flip the arrays if mode = 'uton'. After it converts the input from text to 6 features.
+            3.    Mask octaves to zero to drop notes, only in 1% of cases
+                  likelihood = 0.99 
+            4.    How does the variable repeat_section affect the output: adds a dimension onto the start of the array.
+                  (6, 4, 64) becomes (3, 6, 4, 64)
+                  rolls = np.array([rng.integers(low = roll_low, high = roll_high, size = None) for inx in np.arange(repeat_section)])
+                  note_array = np.array([np.roll(note_array, r, axis = 2) for r in rolls])
+            5.    Do I make the repeats get quieter. I don't know. It's set in the call to build_horn_from_text vel_echo_max = 7 is default.
+            6.    Alter the octave with octave_shift. No octave_shift defaults to 0
+            7.    build_scale_mask for octaves only if not shuffle
+                  if shuffle: scale_mask = np.full(notes.shape, 0) # if you are shuffling the order of notes, don't mask the octaves.
+                  else: scale_mask = dmu.build_scale_mask(notes)  # if you are not shuffling, then mask away.
+                  octv = octv + scale_mask
+                  octv = np.array([np.min((octv[inx],5)) for inx in np.arange(len(octv))]) # limit it to no more than octave 5 or 6
+            8.    When to you tile the voices? Before you send them through build_horn_from_text. What if you were to do that later?
+            9.    Do you roll? No. Roll is only there to repeat_section repeats.
+                  roll_low = 0, roll_high = 1
+            10.   How long is each inputs_array element in terms of the d value sum.
+                  Where is that checked? It's not. It should be. I put in a check to confirm the shape, and got a hit right away:
+                  I fixed that one and this one popped up:
+                              4            4  4  4| 4   12|8      8|4  2         2  2  2    1  1  1  1 
+                        'o4e1v71n0d4u0g16 n2 n1 n4 n3g0 d20n5o0 n4d12 d2o4n5g12 n3 n4 n2 n3d1 n1 n2 n0'
+                        Expected a duration of 64 and received notes.shape[0] = 66
+                        fixed it.
+            11.   Why are we still getting very low octaves:
+                  Why would I have ones in the octaves? They were not in the text input.
+                  It appeaers to be because of the scale_mask application.
+                  Well that explains it. It takes a zero (meaning don't play now) and turns it into a one, very low note.
+                  Should I just dump the octave mask? It's designed to keep a rising scale rising, not arbitratily dropping an octave in certain keys. But when it does it's job, is will frequently send the octave into the stratosphere. Here's an exampld:
+                  scale_mask = array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+                        ...
+                        4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7]) #<-- 7 octaves up? Crazy.
+                  after applying scale_mask:
+                  octv = array([ 4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,  4,
+                        ...
+                        9,  9,  9, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11])
+                  Fortunately, I have a filter that constrains the movement on the back end.                        
+                        octv = np.array([np.min((octv[inx],5)) for inx in np.arange(len(octv))]) # limit it to no more than octave 5 
+                  I changed the logic so I could include it if I wanted to. But for now it's gone.
+
+            12.   New bug. null string in prev_oct. Why?
+                  def text_to_features(input, shuffle = False)
+                  --> 897       octv = np.append(octv, int(prev_oct))
+                  ValueError: invalid literal for int() with base 10: ''
+                  How did prev_oct get loaded with a null string?
+                  It happened in building the bass line in vamp_creator.
+                  It ran ok for a few, then this is what it barfed over:
+                  input_chosen = 'n0o2d2g0e8v77 n2 n4 n6 n1o3d3 n6o2d1e2v82 n3d3e8v77 n4d1e2v82 n2d3e8v77 n0o2d1e2v82 n4n3e8v77 od1e2v82 o2n0d3e8v77 n2d1e2v82 n6d2e8v77 o1d4'
+                  Crash.
+            Prove it:
+                  test_input = 'n0o2d2g0e8v77 n2 n4 n6 n1o3d3 n6o2d1e2v82 n3d3e8v77 n4d1e2v82 n2d3e8v77 n0o2d1e2v82 n4n3e8v77 od1e2v82 o2n0d3e8v77 n2d1e2v82 n6d2e8v77 o1d4'
+                  notes, octv, env, vel, ups, gls, _ = dmu.text_to_features(test_input)
+                  type(prev_oct)= <class 'str'>, prev_oct = '2'
+                  type(prev_oct)= <class 'str'>, prev_oct = ''
+                  Crash.
+                  So the problem isn't that it's a string. You expect that. It's that it's empty.
+                  od1e2v82 <-- There's your trouble. I suppose I could check for zero length strings. Done. Won't happen again, or if it does, I will be quickly able to fix it. 
+
+-------------------
+2/2/23 To do today:
+
+✅    Fix all the changes I made to the bass flute to remove the dropouts. likelihood = 0.99 --> .7, shuffle 10%
+
+✅    Do I make the repeats get quieter. I don't know. I can hear it in the horns, if faint. If you don't notice it, it's not strong enough.
+      I had implemented it, but without comment.
+            note_array[inx, vel_col, :, inx2] -= inx * rng.integers(4, high = vel_echo_max) # decrease the velocity with each repetition. 
+      It works. Perhaps I need to increase vel_echo_max, the larger it is, the quieter the repeats. 
+
+✅    The bass flute is really wiggy. The random choices are very strange. It could be that I need to mask fewer notes. 
+      The quick d1 and d2 slides are ugly. 
+      It sounds like the bass flute notes are being truncated if they are part of a slide. So I reduced the choices to just one for the oton and one for the uton, and the result is a mass of different outputs:
+            'n0o4d12u0g0e1v71 n3d4g12 n4 n5 g0n6 n7 d6n0 g18n1 n3 n2 n4 e8v76d1n6g0 n7'
+            'o4e1v71n0d4u0g16 n1 n2 n3 n4g0 d16n5 e8v76d2n6 n4 e1v71d4n5g24 n3 n4 n2 n3 n1'
+
+----------------------------
+2/3/23 To do today:
+
+✅    Simplify the input to the bass flute and then gradually increase it until you find the errors. 
+            after choosing the input array. inputs_array = 'o4e1v71n0d8u0 n7 n6 n5 n4 n3 n2 n1'
+            after choosing the input array. inputs_array = 'o4e1v71n0d8u0 n1 n2 n3 n4 n5 n6 n7'
+      The end result was lots of notes for every note. It's like somthing changed several times for every note. Instead of a half note, I got repeating 1/8th notes. This would be caused by something changing from one time step to the next, like the velocity, volume, upsample, or the like. 
+      I found our trouble:
+            n	o	e	v	u	g
+            32	0	1	67	255	0
+            32	4	1	67	255	0
+            32	4	1	63	255	0
+            32	4	1	64	255	0
+            32	0	1	63	255	0
+      The velocity for the note 34 is constant, but for the note 32, it changes with every time step. 67 to 62. Why?
+      The vel value is 71 after it comes out of dmu.text_to_features(dmu.fill_out_text(inputs_array), shuffle = shuffle)
+      Something happens after that, probably in dmu.build_horn_from_text(repeat_section, notes, octv, env, vel, ups, gls, voices, \
+                              mode = mode, root = root, rank = rank, roll_low = 0, roll_high = 1, likelihood = 0.75, vel_echo_max = 10) 
+      I'm pretty sure it has something to do with the echo processing. I must have the dimensions wrong. Start there tomorrow.
+      The problem was caused by two issues:
+      1.    Too high a likelihood of masking during a d8 note, turning it into several notes. 
+            If I want to mask a note completely, likelihood is a bad place to do it. Much better on the back end.
+      2.    Echo effect was located in the wrong place      
+            note_array[inx, vel_col] -= inx * rng.integers(4, high = vel_echo_max) # decrease the velocity with each repetition. It needs to be only called once during the inx in np.arange(repeat_section) 
+---------------------
+2/4/23 To do today:
+
+1.    Figure out why it sometimes splits into two different bass flute lines. This is going to be hard to find.
+      I suspect is has something to do with a note split by a dropout.
+      The first one I found in the current version is in a 154 second piece. 
+      27-28 seconds, 42-46, 61-62, 76-80, 95-97, 127-131, 146-149. It's like the border between each of the 9 sections overlap.
+      Ran it again and appear to have the overlap at the same times.
+      27 42 61 76 95 128
+      Same thing again.
+      Next step is to try to synchronize the four voices and see if they are not identical.
+
+      36 start of new voice in the whole piece. Each section is three starts. 9 picks of inputs_array. Each 17 seconds. So perhaps its 
+
+✅    Why is the upsample set to 256 & 257. It's supposed to be 255 or lower. Fixed that one.
+            if np.all(ups[start:end] > 255): ups[start:end] = 0 in two placed
+            f np.all(ups[start:end] < 0): ups[start:end] = 255 in one spot.
+            Fixed it.
+
+✅    The change of note during a slide is too abrupt. 
+      I need it to take longer to go from one place to another. How is that set?
+            gliss_f_table = _build_voice_slide(current_gliss_table + loc, thin(org_notes[start:end]), each_slide_step = 180) # it was 113, changed it to 180, then 225
+            def _build_voice_slide(t_num, one_voice_array, total_slide_size = 2048.0, each_slide_step = 113.0):
+            Default is 113, but that is terribly fast, close to zero. Some bad math somewhere. It can get as big as 240 by assert statement.
+
+4.    Long term I should really shift to the gliss_type == 'cubic16_16_224':
+
+---------------------
+2/5/23 To do today:
+
+✅    Figure out why we have multiple different notes sounding at the end of each section. I think I have an idea.
+      I'm logging notes before they go to dmu.piano_roll_to_notes_features. There are a bunch of errors that need to be fixed:
+      a.    Each note has a different f table. There are 76 different ftables. I guess we don't check for duplicates. 812, 815, 818, & 821 are different ftables for the same note. I fixed that on 2/11/23.
+      b.    Not only that, but there are multiple occurrences of those ftables, and they are each different from the others. Not any more.
+      c.    They are not sequential, and numbers are used more than once. Fixed that.
+      d.    Some of the very short notes have slides. Fixed that.
+      e.    It could be an error in the logging logic. Check it. It was, plus an error in diamond_music_utils.py. After I retrieve a current_gliss_table value, I need to increment it. The number retrieved can be used if it's the first, but not if its the subsequent one.     
+      I've made some improvements, but there are still times when two different notes are played.
+
+-----------------
+2/8/23 To do today:
+
+1.    Pick some better melodies for the bass flute. Remember, you are trying to emulate Anita Baker in Rapture 1986.
+
+✅    Figure out a working system to edit on the T15 and run on the ThinkCentre.
+      a.    This works: 
+            Open vscode on the T15
+            click the double >< in the lower left corner, connect to ThinkCentre
+            open folder Dropbox/Tutorials/Diamond_Music
+            open terminal    
+                  toolbox enter tunnel
+                  hostname -I 
+                        192.168.68.73  # <-- you are accessing the ThinkCentre filesystem directly
+                  conda activate tensorflow.2.6
+                  jupyter lab
+            open a jupyter notebook file in vscode 
+            Select the conda tensorflow.2.6 environment 
+                  You may have to muck around for a while to get it to work.
+                  
+      b.    This works: but it keeps loosing the connection. This morning it actually worked on the iPad. That's good. How long?
+            ssh -L 8889:localhost:8889 prent@192.168.68.73 # <-- on the T15. This may only be necessary if you need to access the Jupyter Lab notebook from a browser. Not if you are only using code-server serve.
+            hostname -i 
+                  192.168.68.73  # <-- you are logged into the ThinkCentre
+            conda activate tensorflow.2.6
+            jupyter lab --notebook-dir Dropbox/Tutorials/Diamond_Music
+                  You may have to kill a running notebook
+                        lsof -i :8889
+                              COMMAND     PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+                              jupyter-l 21417 prent    7u  IPv4 205929      0t0  TCP localhost:ddi-tcp-2 (LISTEN)
+                              jupyter-l 21417 prent    8u  IPv6 205930      0t0  TCP localhost:ddi-tcp-2 (LISTEN)
+                        kill -9 21417
+            code-server serve
+                  open: https://insiders.vscode.dev/+ms-vscode.remote-server/think-center/var/home/prent
+                  Takes a while. When it gets stable, open a folder:
+                  /var/home/prent/Dropbox/Tutorials/Diamond_Music
+            open a jupyter notebook file in code-server     
+            Select a python environment, then select conda tensorflow.2.6 python interpreter.
+            If that doesn't work, access the jupyter notebook here:
+                  http://localhost:8889/lab
+
+      c.    Some combination of the two that relies on Dropbox to move files from one system to another. 
+
+----------------
+2/10/23 To do today:
+
+✅    Put together the skinniest notebook cell you can that can be used to test text to music pipeline. 
+      I need the equivalent of the python REPL.
+      First problem: INIT ERROR in instr 1 (opcode table.i) line 56: table: could not find ftable 0
+      Something wrong with the input, on every one of the 16 notes. I think it's because I missed one of the processes that turns the voice number from the tracking number to the actual csound number. Such as 20-23 into a much lower number.
+      fix_start_times needs to be called.
+            notes_features, voice_time = dmu.fix_start_times(notes_features, voice_time) 
+
+
+✅    The echo horn parts don't repeat as echos. 
+       aybe it's too quiet on the repeats? Need to validate that they are doing what I expect.
+
+-----------------------------
+2/11/23 To do today:
+
+✅    Fix the things you thought you fixed previously:
+      a.    ftable numbers are whack:
+            f 800.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.0909 382.0 1.0909 300.0 1.1818 382.0 1.1818 382.0 1.1818 
+            f 802.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.2222 382.0 1.2222 300.0 1.1111 382.0 1.1111 382.0 1.1111 
+            f 802.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.0909 382.0 1.0909 300.0 1.1818 382.0 1.1818 382.0 1.1818 
+            f 804.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.2222 382.0 1.2222 300.0 1.1111 382.0 1.1111 382.0 1.1111 
+            f 804.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.0909 382.0 1.0909 300.0 1.1818 382.0 1.1818 382.0 1.1818 
+            f 806.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.2222 382.0 1.2222 300.0 1.1111 382.0 1.1111 382.0 1.1111 
+            f 806.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.0909 382.0 1.0909 300.0 1.1818 382.0 1.1818 382.0 1.1818 
+            f 808.0 0.0 2048.0 -7.0 1.0 382.0 1.0 300.0 1.2222 382.0 1.2222 300.0 1.1111 382.0 1.1111 382.0 1.1111 
+            Reusing numbers 802, 804, 806
+            skipping numbers 801, 803, 805
+            Not reusing duplicates that are 100% the same 
+            Suspicious that of 8 ftables, there are only two different ones.
+            Looking at the input: 
+                  3, 4, 5 in scale degree, 38, 44, 46 are the first three note slide E♭, A♭, A♮ (sharp is ♯) 
+                  1, 3, 2 in scale degree, 34, 40, 44 are the second three note slide C♮, F♮, A♭ 
+            Therefore two is the correct number of distinct slides. We just need to not create the duplicates. Later.
+            At least get the numbering right. 
+
+      b.    Why don't I get all the notes in the csd file and audio output?
+            32, 38 (802), 44, 46. That's only half the notes. I'm ignoring the second half of the notes. It's like instead of all 64 time-steps it's only using 32. That's interesting. What is causing the cutoff of notes? 
+            piano_roll_to_notes_features only reads the first 32 time_steps. I suspect it's because the volume array is not large enough. That's it. Fixed it. I wonder how many others are limited by the predicted values?
+            The rest are limited to 32 time_steps apparently. I was able to quickly extend the others in bridge_creator to 64 time_steps. 
+
+✅    Check to see if you have already stored one. Look at build_slides for a template.
+            Got it done. But the echo diminishment is too large. Where is that set? I found it: dmu.build_horn_from_text with vel_echo_max = 10, changed it to 5. I wonder how it sounds in the horns part of vamp_creator.
+
+---------------------------
+2/12/23 To do today:
+
+✅    Now that I have the bridge_creator working with repeat_notes = 16, I wish I could make that optional, so the bridge could be faster.           
+
+-----------------
+2/13/23 To do today:
+
+✅    Need to implement #2 from 2/12/23. Vary the length of the bridge_creator inputs.
+      All four parts must be able to use 1/2 the duration, maybe 1/4 if it would work.
+      Try:
+            repeat_notes = 4 and see what breaks.
+
+-------------------
+2/14/23 To do today:
+
+✅    The timing of the different parts is not correct. 
+      a.    at 120 seconds , the horn switches to the bridge_creator, while the bass flute is still on the vamp_creator.
+      b.    at 72 seconds, the horn has moved the vamp_creator, while the bass flute is still on bridge_creator, and what is the trill at 92 seconds?
+      The problem is that I need to have all the bridge_creator sections have the same length, because the horn only gets one try, and all the other instruments must match that duration, otherwise the horn is out of synch. 
+      Fixed it. Now try setting long_bridge to 1,2,or 4. Works great. But I still haven't made customer inputs_array_32 = It was just slicing another one and calling it good. And at 80 seconds in it's great. 
+
+✅    I have 1 & 2 working, but 4 is sketchy. 
+      It only plays the bass flute for half the duration, then it's just the horns changing so slowly as to not being apparent.
+
+------------------------------
+2/15/23 To do today:
+
+✅    Post version 26. It's pretty good. Two long_bridge 1's and one 2. Nice arrangement. Once I heard the full thing I noticed that the bass part disappeared. Did not post.
+
+✅    I think I've fixed the long_bridge choices, but the one with length of 4 is way too long. 
+      I need to cut all of their lengths in half, then I can choose 1,2, or 4. That's going to lead to some real crap, I'm afraid.
+      First, let me see if the 4 actually works.
+      #2 leaves a long space at the end without the flute. Not cool. I can't figure out how to fix it.
+
+-------------------------
+2/16/23 To do today:
+
+✅    Figure out why the second half of the long_bridge = 4 doesn't have any bass flute. 
+      Does it have anything to do with the way I hacked the bass part by not including a longer bass part?
+
+✅    Check the relationship between long_bridge = 4, key_metric = 1, and repeat_verse = 2. 
+      Do they all do basically the exact same thing and are therefore superfluous? Clearly having large numbers for the latter two and 4 for the former results in a very long bridge_creator. Like 10 minutes or more. That is not what I wanted.
+
+✅    Make sure the echo diminishment is sufficient for the horn in the vamp_creator. 7 should do it. Bumped it to 10
+
+✅    Something is wiggy with the bass flute gliss selection. They look like velocities, not ftable numbers. Whack.
+            bass_flute_note_array.shape = (6, 4, 32)
+            2023-02-16 07:22:14,026 - root - INFO - inx	n	o	e	v	u	g	d
+            2023-02-16 07:22:14,026 - root - INFO -  0	32	4	0	255	1	70	6
+            2023-02-16 07:22:14,026 - root - INFO -  1	38	4	0	255	8	78	2
+            ...
+            2023-02-16 07:22:14,029 - root - INFO -  13	44	4	0	255	8	73	1
+
+      Think hard. What did you change. You changed the value of val_echo_max. Why would that screw things up?
+      I've been all through build_horn_from_text and the numbers are either 0 or 800+ all the way to the end. 
+      I'm beginning to think that there is something wrong with the logging of values. I haven't been looking at them for a while, they may have started going wrong a long time ago. 
+      The v values of 255 are actual values for upsamples, e values of 0 are more likely upsamples, and g are velocity, while u of 1,8 are envelopes. 
+      build_horn_from_text outputs notes_in_scale, octave_array, gliss_array, ups_array, envelope_array, vel_array
+      log_notes expects notes, octv, gls, ups, env, vel, and builds d
+      There's your trouble. I reordered all the parameters as noguev and d. 
+      Fixed it. That was nasty.
+
+✅    Now when I set long_bridge to 1, the arpeggio and bass are silent. This is wierd.
+      inst = 31	dmu.format_seconds_to_minutes(dur) = '00:02:36.000' <-- 2:36
+      inst = 3	dmu.format_seconds_to_minutes(dur) = '00:02:00.000' <-- 2:00 why did it stop?
+      Look at the size of the volume_array. It's correct. Where else?
+      This is too hard. Time for a walk.
+
+--------------------------------
+2/17/23 To do today:
+
+✅    Complete the bridge_creator support for long_bridge = 1,2,4. 
+      It works correctly as the first call to bridge, will it fail as the second?
+      Could it be I left off a critical axis statement:
+            notes_features = np.concatenate((notes_features, current_notes_features), axis = 0) # <-- the axis was missing before
+      Perhaps, but I'm still missing the arp part in the second bridge call. 2:00 vs. 2:36 for all the other instruments.
+      It's not caused by long_bridge = 1. The second bridge with long_bridge = 2 is also missing the arp part.
+      Now it's happening with just one bridge call long_bridge = 2 or 4 but not = 1. arp is short notes. Something is wrong with the note counts in arp section of bridge_creator for long_bridge 2 & 4, and for bflu in 4:
+            long_bridge       bass  horn   arp  bflu
+            1                 1:00  1:00  1:00  1:00
+            2                 2:48  2:48  2:48  2:48
+            4                 5:12  5:12  5:12  2:48 <-- I just need to fix bflu 
+      Start with long_bridge = 2. Where to look:
+      a.    _predicted: all 64
+      b.    volume_array: all 64
+      c.    We predict 64 but only 32 time_steps are created. This could be the trouble.
+            multiplied repeat_all by long_bridge, then removed long_bridge from arpeggio_predicted.
+      Now fix long_bridge = 4 for bass flute. without messing up the previous ones. Compare bass_flute_predicted with the dimension of the time_steps.
+      building the bass flute line in bridge_creator
+      bass_flute_predicted = 128, repeat_section = 1, key_metric = 1, repeat_notes = 8, repeat_all = 2, mult = 16, voices = 4
+      expected_time_steps = 64, inputs_array = 'e1v70n0o5d12u0g0 d10o0 e8v78n2d2o5 n4 n3 n5 e1v70n7d8g12 n6d4 e8v78g0d2n1 n3 n0 e1v70g12d4n4 n2 n3 g0n1', repeat_notes = 8
+      There it is. bass_flute_predicted = 128 expected_time_steps = 64
+      volume_array.shape = (128,)
+      How can I fix that without screwing up the others. Some key values
+            repeat_section = key_metric
+            repeat_notes = long_bridge * 2 # <-- not used.
+            repeat_all = 2 
+      How are they used? repeat_notes isn't used at all!
+      Now the vamp_creator bass_flute_predicted is off: bfp = 192, arp = 96
+      I think I fixed the problem with bass flute predicted in vamp_creator, but I'll have to confirm it with other values of long_bridge
+      I also reverted to an old version to create bass_flute_predicted, and now they match.
+      But the timing is close but not there yet. Still 5:12 vs 2:48 
+      Those numbers are not in a simple relationship to each other: 5:12 = 312 seconds 2:48 = 168 312/168 = 1.857xxx
+      I figured I could just double the 2:48 and get 5:12, but that's not the case. Very strange.
+      Anyway, I definitely have 64 time_steps.
+      repeat_section causes the rolls, which are the echos.
+      Almost cleared them all up, except for bass flute with long_bridge = 4. I thought I had that, but not really.
+      most are 10:00 and bass flute is 7:36.
+      Bass flute starts out as 64, then 192 - 3 times is probably the roll function. Should be 4. That fixed it for now.
+
+✅    What's going on with the bass. It stops at 257 seconds. Doesn't start up until 678 seconds. It disappears for seven minutes. 
+      It's not because of the density function. I changed it for the simpler version without any major dropouts, and the gap persists.
+      It's the bridge_creator bass line when long_bridge = 4. Check:
+      a.    octaves: was it missing in the text input - no. search for Here are the bass notes in the ball3.log.
+      b.    isolate just the bass line.
+
+------------------------
+2/18/23 To do today:
+
+✅    Figure out what the problem is with long_bridge = 4 in the bass part. 
+      It's there, just very quiet. And slow. The notes exist. It's just that all the velocity values are zero. I saw that the order of passing parameters was not noguev,d as it should be and fixed that. This has no effect on the problem I was supposed to be addressing.
+      inside build_bass_line, np.max(vel_array) = 82 in the vamp_creator, and only 0 in the bridge_creator. That's strange.
+      Found the trouble:
+      in bridge_creator, the return values are in the wrong order. They were:
+            notes, octv, env, vel, ups, gls = dmu.text_to_features(input_to_process)
+      and they should be:
+            notes, octv, gls, ups, env, vel
+      That solved the problem. For now.
+      I was able to create ball3-t29 & ball3-t30 that sound pretty good. I'm still concerned about the mistimed trills. Let's get systematic about cleaning these up. Posted #30 on the blog and twitter. Not on facebook yet.
+
+2.    I'm still bugged by:
+      ✅    Trills don't match the tempo always. It's like one of them is mistimed. I had to cut the hold to hold * 1.01. 
+            Improvement but not a final correction.
+      b.    Bass flute melody is nothing special. It could be much better. Later
+      ✅    The density input was built before recent revisions. 
+            It needs to be created again. Or replacedd. I like the idea of replacing it. It was hard to keep, provided limited musical improvement, and wasn't able to make changes inside a verse or bridge. I'd call it a failurew. 
+
+✅    I could redo #30 with more accurate timing for the density function. 
+      I did not set final, and so did not take advantage of any of the density variations.
+      I didn't notice that, so maybe it's not so important.
+
+✅    I messed around with piano_roll_to_notes_features and now zero notes are making it into new_output.csd. Zero.      
+      In send_to_csound_file after selecting for non-zero hold values. notes_features.shape = (0,) That's not right. All zero?
+      It was because I had set hold * 0.0 instead of hold * 1.01. Oops. That's better than 1.1 in terms of getting the trills to sync with the rhythm. But 1.01 is better. 
+
+----------------
+2/19/23 To do today:
+
+✅    Choose a density_function method that provides more control at the micro level, as well as the macro. 
+      Control inside a section, and between all sections
+
+✅    The lowest arpeggios sound off. I fixed it with several changes. I now track the average octave, and it's staying around 3.8, which is good. 
+      Added control of the likelihood of a mask as a probabilistic number.
+            likelihood = rng.choice([.5, .6, .7, .8], p = [.1, .2, .4, .3]) # range of probabilities to be masked from 50% to 20%
+            logging.info(f'setting the mask in bass vamp. {divisor = }, {likelihood = }, {np.max(octv) = }, {np.min(octv) = }')
+            mask = rng.choice([0, 1], size = (voices, divisor), p = [1 - likelihood, likelihood])
+
+--------------------------
+2/21/23 To do today:
+
+Long term changes:
+
+1.    Shift to gliss_type == 'cubic16_16_224' for the build_horn_from_text function. This would really improve the quality of the slides in the bass flute. Perhaps.
+
+2.    Implement hold control inside text_to_features _parse, _arrays_from_text. 
+      It will need some pretty massive changes to piano_roll_to_notes_features. Let's see what it sounds like at 1.01 first.
+
+3.    The Aretha Franklin "Say a Little Prayer" contains some incredible glissandi. As does Anita Baker "Giving You the Best that I Got". "Good Love". 
+      Actually every song in the Apple Music Anita Baker Essentials collection should be a guide for your next bass flute melody.
+
+Short term changes:
+
+✅    Take the advice you heard on the zoom conference last week. 
+      If all your music is made up of 16th notes then your suffer from monotonousness. Try some other rythms. That means getting away from the mask to turn quarter notes into random complex 16th notes patterns. Use the likelihood modification from yesterday to make things even more sparse. Let the rhythms other than 1/16th notes flourish.
+      One idea that has the highest effort to benefit ratio: Keep that same mask for longer periods of time so the rhythm has time to soak in. 
+      The masks are so small that they change very little from one time through the bridge_creator and the next. 
+      I reduced the density significantly, and let's see if that makes it simpler to follow.
+
+---------------------
+2/23/23 To do today: 
+
+✅    Make it more sparse. 
+-------------------
+2/24/23 To do today:
+
+✅    Make another three candidate mp3 files and go for a walk.
+
+2.    Choose one.
+
+------------------
+2/25/23 To do today:
+
+1. Move on to another sound. Some musical ideas:
+      a.    Remake of Cuernavaca with more variety of possible keys. A music box that seems very out of tune getting more and more towards just harmony as it slows down.
+      b.    Look at other ranks, include C,D, or maybe the higher orders.
+      c.    Cello martele, finger piano, woodwinds, brass
+      d.    
+
+2.    Update the github, blog, facebook, twitter.
+
+3.    Go back and listen to the first experiments with Bosendorfer & coconet rhythms. 
+      These avoided a preponderance of 4:4 measures, which led to many surprises.
+
+4.    Some coding ideas to avoid tickly-tacky 1/16th note rhythms caused by masking. 
+      a.    Perhaps I could create a mask that limited the number of continuous 1/16th notes. What would characterize such rhythms? 
+      Assume you start with a tonicnet Bach chorale, with lots of quarter notes, and several half and other mixed notes. Try to hand craft some masks and see what avoids the heavy dominance of 1/16th notes. It might be some check to make sure there are always at least two ones in a row. Or more. But there must be no more than a certain number of either ones or zeros. 
+
+      b.    Perhaps I could take advantage of the processing of _arrays_from_text to generate time_steps from notes and durations. Make a flow chart from text to time steps to piano rolls to notes, feaatures. Introduce filters along the way and see what happens.
+
+      c.    Add more features to _arrays_from_text. Start with holds. Take a look at comands.txt file. It has all the csound command letters. I really wish I had some of these, like the add, subtract, multipy, and divide. Or perhaps the right envelope, left envelope distiction. Stereo if it could default to a random location, some number than didn't mean location, but rather to let the system choose a random location in the 0 - 15 field. Like maybe 16. 
+
+      d.    Consider changing the upsample values from 253, 254, 255, 0, 2, 1, 2 ,3 to -3, -2, -1, 0, 1, 2, 3. 
+
+      e.    Generate evelope ftables on the fly instead of using the ones in csound.
+

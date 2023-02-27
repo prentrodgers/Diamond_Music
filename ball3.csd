@@ -289,7 +289,8 @@ f769 0 128 -17 0 773 36 774 38 775 40 776 41 777 43 778 45 779 46 780 48 781 50 
 f770 0 64 -2 0  35  37  39  40  42  44  45  47  49  50  52  54  56  58  59  61  63  65  67  69  71  73  75  77  79  81  83 
 f771 0 64 -2 0 -9  -7  -6  -15 -4  -7  -9  +2  -5  -9  -5  +3  -6  +5  -14 -1  -1  +25 +6  -7  +2  -1  -2  +0  -2  -6  +11 
 f772 0 64 -2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
-f799 0 256 -7 1 256 1 ; g0 = no change; 
+; f799 0 256 -7 1 256 1 ; g0 = no change; 
+f0 0 256 -7 1 256 1 ; this may also be created by the glissando
 ;t 60
 f605 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif" 0 0 0
 f606 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/e1.aif" 0 0 0
@@ -446,7 +447,7 @@ f796 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5F+0.
 f797 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5G+0.wav" 0 0 0
 f798 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5A-5.wav" 0 0 0
 ; f799 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/Baritone Guitar/H5B+13.wav" 0 0 0 encroches on the glissando at 799
-f0 200
+; f0 200
 f1 0 64 -2 0 601 630 656 661 666 671 687 706 728 748 769 
 f2 0 64 -2 0 1 1 2 2 2 2 2 2 2 2 1
 ;Inst Start        Dur  Vel    Ton   Oct   Voice Stere Envlp Gliss Upsamp R-Env 2nd-gl 3rd Mult Line # ; Channel
