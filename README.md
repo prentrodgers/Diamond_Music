@@ -111,13 +111,11 @@ for file in *.zip; do unzip "$file"; done
 </code>
   
 Make a storage location for the wav files:
-  
 <code>  
 mkdir /home/prent/Music/sflib # this is set at the top of saved.csd 
 </code>
   
 Run a csd file that csound can process, with the unzipped sample files
-  
 <code>  
 csound saved.csd
 </code>
