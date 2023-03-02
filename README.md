@@ -21,9 +21,10 @@ This repo contains a jupyter notebook and python module that can be used to send
 ## Installation Requirements 
 
 I've found that the simplest way to set up the minimal environment to run this code is to do the following:
-1.    I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
-            toolbox create virtual_python
-            toolbox enter virtual_python
+<ol>
+<li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
+            <code>toolbox create virtual_python</code>
+            <code>toolbox enter virtual_python</code></li>
 2.    Inside the toolbox install python3.11            
             sudo dnf install python3.11 -y
 3.    verify it's the right version
