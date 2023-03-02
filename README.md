@@ -24,48 +24,86 @@ I've found that the simplest way to set up the minimal environment to run this c
 <ol>
 <li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
   
-        <code>toolbox create virtual_python</code>
-        <code>toolbox enter virtual_python</code></li>
+        toolbox create virtual_python
+
+        toolbox enter virtual_python
+        </li>
           
 <li>Inside the toolbox 
-      <code>dnf install python3.11</code></li>
+ 
+      dnf install python3.11</li>
+       
 <li>verify it's the right version
-            <code>python3.11 --version</code></li>
-Optional steps 4 & 5:            
-<li>create a REPL to try some python code
-            <code>python3.11</code></li>
+ 
+            python3.11 --version</li>
+             
+Optional steps 4 & 5:             
+
+<li>create a REPL to try some python code 
+  
+            python3.11</li>
+              
 <li>execute some sample python code:
-            <code>print('Hello World!")</code>
-            <code>quit()</code></li>
+ 
+            print('Hello World!")
+
+            quit()</li>
+
 Recommended steps 6 & 7
+ 
 <li>build a python virtual environment
-      <code>python3.11 -m venv virtual_python</code></li>
+  
+      python3.11 -m venv virtual_python</li>
+        
 <li>Activate the environment
-      <code>source virtual_python/bin/activate</code></li>
+ 
+      source virtual_python/bin/activate</li>
+        
 Required steps:           
+  
 <li>install pip in the virtual environment             
-            <code>python3.11 -m pip install --upgrade pip</code></li>
+  
+            python3.11 -m pip install --upgrade pip</li>
+              
 <li>install other packages:
-      <code>pip3.11 install jupyterlab
-            pip3.11 install numpy 
-            pip3.11 install matplotlib
-            pip3.11 install scipy</code></li>
+ 
+      pip3.11 install jupyterlab
+      pip3.11 install numpy 
+      pip3.11 install matplotlib
+      pip3.11 install scipy</li>
+       
 Required if you want to run csound in the notebook:
+ 
 <li>If you want to run csound:
-      <code>sudo dnf install csound-devel sox</code></li>
+ 
+      sudo dnf install csound-devel sox</li>
+       
 <li>To run the csound with my sample files:
-      <code>cd Diamond_Music # if you are not already there.</code>
-      Then unzip the sample files:
-      <code>for file in *.zip; do unzip "$file"; done</code>
+ 
+      cd Diamond_Music # if you are not already there.
+
+Then unzip the sample files:
+
+      for file in *.zip; do unzip "$file"; done
+
       Make a storage location for the wav files:
-      <code>mkdir /home/prent/Music/sflib # this is set at the top of saved.csd </code>
+
+      mkdir /home/prent/Music/sflib # this is set at the top of saved.csd 
+
       Run a csd file that csound can process, with the unzipped sample files
-      <code>csound saved.csd</code></li>
+
+      csound saved.csd</li>
+
 <li>Once this is done, to start up a jupyter lab session:
-      <code>jupyter-lab</code></li>
+
+      jupyter-lab</li>
+
 <li>When you have finished, you can exit the virtual environment:
-      <code>deactivate</code></li>
+
+      deactivate</li>
+
 </ol>
+
 ### Installation info for toolbox:
 https://github.com/containers/toolbox            
 
@@ -79,13 +117,13 @@ I've included some instrument sample files that are required to run the csound i
 -   F_Piano_Guit_Archive.zip
 
 You will need to decompress those into a directory on your computer, and adjust the file "ball3.csd" so that it points to the right directory. In the csound file "ball3.csd" the samples are identified by their location. Currently that is only relevant to my system:
-<code>
+
 f605 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif" 0 0 0
-</code>
-You will need to edit "ball3.csd" to replace <code>/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif</code> with the location of that file on your computer. If you don't then csound won't work. You will have to do that with every file in the collection. 
+
+You will need to edit "ball3.csd" to replace /home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif with the location of that file on your computer. If you don't then csound won't work. You will have to do that with every file in the collection. 
 
 ## Notes concerning where csound writes it's output 
-Csound creates some very large wave files. I recommend that you put them in <code> ~/Music/sflib </code>. That's where the two bash scripts in the repo expect them to be, and where the csound files ball3.csd and ball3c.csd put them.
+Csound creates some very large wave files. I recommend that you put them in  ~/Music/sflib . That's where the two bash scripts in the repo expect them to be, and where the csound files ball3.csd and ball3c.csd put them.
 
 # Examples 
 You can listen the some results on http://ripnread.com, with the most recent one here: http://ripnread.com/listen/ball3-t35.mp3
