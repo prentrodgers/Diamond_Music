@@ -28,33 +28,41 @@ I've found that the simplest way to set up the minimal environment to run this c
             sudo dnf install python3.11 -y
 3.    verify it's the right version
             python3.11 --version
+Optional steps 4 & 5:            
 4.    create a REPL to try some python code
             python3.11
 5.    execute some sample python code:
             print('Hello World!")
             quit()
-6.    create a test directory
-            mkdir ~/virtual_python && cd ~/virtual_python
-7.    build a python virtual environment
+Recommended steps 6 & 7
+6.    build a python virtual environment
             python3.11 -m venv virtual_python
-8.    Activate the environment
+7.    Activate the environment
             source virtual_python/bin/activate
-9.    install pip in the virtual environment             
+Required steps            
+8.    install pip in the virtual environment             
             python3.11 -m pip install --upgrade pip
-10.   install other packages:
+9.   install other packages:
             pip3.11 install jupyterlab
             # I also use these libraries, but I can't find them using pip importlib pprint copy logging os
             pip3.11 install numpy 
             pip3.11 install matplotlib
             pip3.11 install scipy
-
-11.   If you have trouble installing specific packages using PIP, you should install the following packages:
-            sudo dnf install gcc openssl-devel bzip2-devel libffi-devel zlib-devel wget make -y
-12.   If you want to run csound:
+Required if you want to run csound in the notebook, step 10
+10.   If you want to run csound:
             sudo dnf install csound-devel sox            
-13.   Once this is done, to start up a jupyter lab session:
+
+11.   To run the csound with my sample files:
+            cd Diamond_Music # if you are not already there.
+      Then unzip the sample files
+            for file in *.zip; do unzip "$file"; done
+      Make a storage location for the wav files
+            mkdir /home/prent/Music/sflib # this is set at the top of saved.csd 
+      Run a csd file that csound can process, with the unzipped sample files
+            csound saved.csd 
+11.   Once this is done, to start up a jupyter lab session:
             jupyter-lab            
-13.   When you have finished, you can exit the virtual environment:
+12.   When you have finished, you can exit the virtual environment:
             deactivate                         
 
 ### Installation info for toolbox:
