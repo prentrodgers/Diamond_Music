@@ -23,6 +23,7 @@ This repo contains a jupyter notebook and python module that can be used to send
 I've found that the simplest way to set up the minimal environment to run this code is to do the following:
 <ol>
 <li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
+
 <code>  
 toolbox create virtual_python
 toolbox enter virtual_python
@@ -38,6 +39,7 @@ dnf install python3.11
 <li>verify it's the right version
 <code>   
 python3.11 --version
+</code>
 </li>
              
 Optional steps 4 & 5:             
@@ -45,6 +47,7 @@ Optional steps 4 & 5:
 <li>create a REPL to try some python code 
 <code>  
 python3.11
+</code>
 </li>
               
 <li>execute some sample python code:
@@ -52,6 +55,7 @@ python3.11
 <code>  
 print('Hello World!")
 quit()
+</code>
 </li>
 
 Recommended steps 6 & 7
@@ -59,12 +63,13 @@ Recommended steps 6 & 7
 <li>build a python virtual environment
 <code>    
 python3.11 -m venv virtual_python
-
+</code>
 </li>
         
 <li>Activate the environment
 <code>   
 source virtual_python/bin/activate
+</code>
 </li>
         
 Required steps:           
@@ -72,6 +77,7 @@ Required steps:
 <li>install pip in the virtual environment             
 <code>    
 python3.11 -m pip install --upgrade pip
+</code>
 </li>
               
 <li>install other packages:
@@ -81,6 +87,7 @@ pip3.11 install jupyterlab
 pip3.11 install numpy 
 pip3.11 install matplotlib
 pip3.11 install scipy
+</code>
 </li>
        
 Required if you want to run csound in the notebook:
@@ -89,39 +96,45 @@ Required if you want to run csound in the notebook:
  
 <code>  
 sudo dnf install csound-devel sox
+</code>
 </li>
        
 <li>To run the csound with my sample files:
  
 <code>  
 cd Diamond_Music # if you are not already there.
-
+</code>
 Then unzip the sample files:
 
 <code>  
 for file in *.zip; do unzip "$file"; done
+</code>
 
 Make a storage location for the wav files:
 
 <code>  
 mkdir /home/prent/Music/sflib # this is set at the top of saved.csd 
+</code>
 
 Run a csd file that csound can process, with the unzipped sample files
 
 <code>  
 csound saved.csd
+</code>
 </li>
 
 <li>Once this is done, to start up a jupyter lab session:
 
 <code>  
 jupyter-lab
+</code>
 </li>
 
 <li>When you have finished, you can exit the virtual environment:
 
 <code>  
 deactivate
+</code>
 </li>
 
 </ol>
