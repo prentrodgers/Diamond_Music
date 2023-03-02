@@ -23,49 +23,47 @@ This repo contains a jupyter notebook and python module that can be used to send
 I've found that the simplest way to set up the minimal environment to run this code is to do the following:
 <ol>
 <li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
-            <code>toolbox create virtual_python</code>
-            <code>toolbox enter virtual_python</code></li>
-2.    Inside the toolbox install python3.11            
-            sudo dnf install python3.11 -y
-3.    verify it's the right version
-            python3.11 --version
+        <code>toolbox create virtual_python</code>
+        <code>toolbox enter virtual_python</code></li>
+<li>Inside the toolbox 
+      <code>dnf install python3.11</code></li>
+<li>verify it's the right version
+            <code>python3.11 --version</code></li>
 Optional steps 4 & 5:            
-4.    create a REPL to try some python code
-            python3.11
-5.    execute some sample python code:
-            print('Hello World!")
-            quit()
+<li>create a REPL to try some python code
+            <code>python3.11</code></li>
+<li>execute some sample python code:
+            <code>print('Hello World!")</code>
+            <code>quit()</code></li>
 Recommended steps 6 & 7
-6.    build a python virtual environment
-            python3.11 -m venv virtual_python
-7.    Activate the environment
-            source virtual_python/bin/activate
-Required steps            
-8.    install pip in the virtual environment             
-            python3.11 -m pip install --upgrade pip
-9.   install other packages:
-            pip3.11 install jupyterlab
-            # I also use these libraries, but I can't find them using pip importlib pprint copy logging os
+<li>build a python virtual environment
+      <code>python3.11 -m venv virtual_python</code></li>
+<li>Activate the environment
+      <code>source virtual_python/bin/activate</code></li>
+Required steps:           
+<li>install pip in the virtual environment             
+            <code>python3.11 -m pip install --upgrade pip</code></li>
+<li>install other packages:
+      <code>pip3.11 install jupyterlab
             pip3.11 install numpy 
             pip3.11 install matplotlib
-            pip3.11 install scipy
-Required if you want to run csound in the notebook, step 10
-10.   If you want to run csound:
-            sudo dnf install csound-devel sox            
-
-11.   To run the csound with my sample files:
-            cd Diamond_Music # if you are not already there.
-      Then unzip the sample files
-            for file in *.zip; do unzip "$file"; done
-      Make a storage location for the wav files
-            mkdir /home/prent/Music/sflib # this is set at the top of saved.csd 
+            pip3.11 install scipy</code></li>
+Required if you want to run csound in the notebook:
+<li>If you want to run csound:
+      <code>sudo dnf install csound-devel sox</code></li>
+<li>To run the csound with my sample files:
+      <code>cd Diamond_Music # if you are not already there.</code>
+      Then unzip the sample files:
+      <code>for file in *.zip; do unzip "$file"; done</code>
+      Make a storage location for the wav files:
+      <code>mkdir /home/prent/Music/sflib # this is set at the top of saved.csd </code>
       Run a csd file that csound can process, with the unzipped sample files
-            csound saved.csd 
-11.   Once this is done, to start up a jupyter lab session:
-            jupyter-lab            
-12.   When you have finished, you can exit the virtual environment:
-            deactivate                         
-
+      <code>csound saved.csd</code></li>
+<li>Once this is done, to start up a jupyter lab session:
+      <code>jupyter-lab</code></li>
+<li>When you have finished, you can exit the virtual environment:
+      <code>deactivate</code></li>
+</ol>
 ### Installation info for toolbox:
 https://github.com/containers/toolbox            
 
