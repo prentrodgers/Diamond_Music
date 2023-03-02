@@ -23,8 +23,10 @@ This repo contains a jupyter notebook and python module that can be used to send
 I've found that the simplest way to set up the minimal environment to run this code is to do the following:
 <ol>
 <li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
+  
         <code>toolbox create virtual_python</code>
         <code>toolbox enter virtual_python</code></li>
+          
 <li>Inside the toolbox 
       <code>dnf install python3.11</code></li>
 <li>verify it's the right version
