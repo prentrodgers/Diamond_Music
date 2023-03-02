@@ -24,9 +24,8 @@ I've found that the simplest way to set up the minimal environment to run this c
 <ol>
 <li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
   
-        toolbox create virtual_python
-
-        toolbox enter virtual_python
+      toolbox create virtual_python
+      toolbox enter virtual_python
 </li>
           
 <li>Inside the toolbox 
@@ -36,21 +35,20 @@ I've found that the simplest way to set up the minimal environment to run this c
        
 <li>verify it's the right version
  
-            python3.11 --version
+      python3.11 --version
 </li>
              
 Optional steps 4 & 5:             
 
 <li>create a REPL to try some python code 
   
-            python3.11
+      python3.11
 </li>
               
 <li>execute some sample python code:
  
-            print('Hello World!")
-
-            quit()
+      print('Hello World!")
+      quit()
 </li>
 
 Recommended steps 6 & 7
@@ -69,7 +67,7 @@ Required steps:
   
 <li>install pip in the virtual environment             
   
-            python3.11 -m pip install --upgrade pip
+      python3.11 -m pip install --upgrade pip
 </li>
               
 <li>install other packages:
