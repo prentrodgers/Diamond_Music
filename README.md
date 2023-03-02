@@ -148,6 +148,7 @@ I've included some instrument sample files that are required to run the csound i
 -   Frn_Hrn_B_Flut_Archive.zip
 -   Clar_Bassoon_Archive.zip
 -   F_Piano_Guit_Archive.zip
+-   BalloonD.zip
 
 You will need to decompress those into a directory on your computer, and adjust the file "ball3.csd" so that it points to the right directory. In the csound file "ball3.csd" the samples are identified by their location. Currently that is only relevant to my system:
 
