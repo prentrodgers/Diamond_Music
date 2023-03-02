@@ -22,7 +22,7 @@ This repo contains a jupyter notebook and python module that can be used to send
 
 I've found that the simplest way to set up the minimal environment to run this code is to do the following:
 <ol>
-<li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system. 
+<li>I recommend the a container builder called toolbox to create containers, but that is optional. It builds containers behind the scenes and give you access to the host file system.
   
 <code>  
 toolbox create virtual_python
@@ -45,7 +45,6 @@ python3.11 --version
 </li>
              
 Optional steps 4 & 5:             
-
 <li>create a REPL to try some python code 
   
 <code>  
@@ -62,7 +61,6 @@ quit()
 </li>
 
 Recommended steps 6 & 7
-  
 <li>build a python virtual environment
 <code>    
 python3.11 -m venv virtual_python
@@ -77,7 +75,6 @@ source virtual_python/bin/activate
 </li>
         
 Required steps:           
-  
 <li>install pip in the virtual environment     
           
 <code>    
@@ -86,7 +83,6 @@ python3.11 -m pip install --upgrade pip
 </li>
               
 <li>install other packages:
-  
 <code>   
 pip3.11 install jupyterlab
 pip3.11 install numpy 
@@ -96,7 +92,6 @@ pip3.11 install scipy
 </li>
        
 Required if you want to run csound in the notebook:
- 
 <li>If you want to run csound:
   
 <code>  
