@@ -150,11 +150,29 @@ I've included some instrument sample files that are required to run the csound i
 -   F_Piano_Guit_Archive.zip
 -   BalloonD.zip
 
-You will need to decompress those into a directory on your computer, and adjust the file "ball3.csd" so that it points to the right directory. In the csound file "ball3.csd" the samples are identified by their location. Currently that is only relevant to my system:
+You will need to decompress those into a directory on your computer, which can be done with this command in Linux:
 
+<code>  
+for file in *.zip; do unzip "$file"; done
+</code>
+
+Once they are expanded, you will need to adjust the file "ball3.csd" so that it points to the right directory. In the csound file "ball3.csd" the samples are identified by their location. Currently that is only relevant to my system:
+
+<code>
 f605 0 0 1 "/home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif" 0 0 0
+</code>
 
-You will need to edit "ball3.csd" to replace /home/prent/Dropbox/csound/McGill/Partition I/FingerP/c1.aif with the location of that file on your computer. If you don't then csound won't work. You will have to do that with every file in the collection. 
+In a text editor, delete 
+
+<code>
+"/home/prent/Dropbox/csound/McGill/Partition I/" 
+</code>
+
+from all the lines in ball3.csd, leaving 
+
+<code>
+"f605 0 0 1 "FingerP/c1.aif" 0 0 0"
+</code>
 
 ## Notes concerning where csound writes it's output 
 Csound creates some very large wave files. I recommend that you put them in  ~/Music/sflib . That's where the two bash scripts in the repo expect them to be, and where the csound files ball3.csd and ball3c.csd put them.
